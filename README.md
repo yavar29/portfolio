@@ -11,4 +11,4 @@ Personal portfolio website showcasing AI/ML projects and software engineering wo
 - **Animations:** Framer Motion
 - **Icons:** Lucide React
 - **Fonts:** Inter + Plus Jakarta Sans
-- **Deployment:** Vercel
+- **Deployment:** IONOS
