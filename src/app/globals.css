@@ -1,26 +1,246 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-brand-primary: #6C48C5;
+  --color-brand-secondary: #F0ECF9;
+  --color-brand-dark: #111827;
+  --color-brand-light: #FAFAFA;
+
+  --color-lavender-50: #F9F7FF;
+  --color-lavender-100: #F0ECF9;
+  --color-lavender-200: #E2DAF2;
+  --color-lavender-300: #C9BBE5;
+  --color-lavender-400: #A78DD4;
+  --color-lavender-500: #8B6FC0;
+  --color-lavender-600: #6C48C5;
+  --color-lavender-700: #5A3BA6;
+  --color-lavender-800: #4A3088;
+  --color-lavender-900: #35215F;
+
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-heading: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Playfair Display", ui-serif, Georgia, serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+  }
+
+  body {
+    background-color: #FFFFFF;
+    color: var(--color-brand-dark);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+  .text-gradient {
+    background: linear-gradient(135deg, #6C48C5 0%, #0EA5E9 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .bg-hero-gradient {
+    background: linear-gradient(170deg, #F3EFF9 0%, #F7F4FC 30%, #FCFCFE 55%, #F2FAF6 100%);
+  }
+
+  .bg-about-gradient {
+    background: linear-gradient(170deg, #F0ECF9 0%, #FFFFFF 50%, #EFF6FF 100%);
+  }
+
+  .bg-featured-gradient {
+    background: linear-gradient(170deg, #EFF6FF 0%, #F0F9FF 50%, #F0FDFA 100%);
+  }
+
+  .bg-projects-gradient {
+    background: linear-gradient(170deg, #FFFBEB 0%, #FFF7ED 50%, #FFFFFF 100%);
+  }
+
+  .bg-journey-gradient {
+    background: linear-gradient(175deg, #fef9f0 0%, #f8f2e4 28%, #f2ede4 52%, #eef2f8 76%, #eaf0fb 100%);
+  }
+
+  .bg-skills-gradient {
+    background: linear-gradient(170deg, #F3F0FF 0%, #F9F7FF 40%, #FFFFFF 70%, #F0FDFA 100%);
+  }
+
+  .photo-cutout {
+    filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.15)) drop-shadow(0 8px 16px rgba(0, 0, 0, 0.1));
+  }
+
+  /* ── Hero dot grid pattern ── */
+  .hero-dots {
+    background-image:
+      radial-gradient(circle, #c9bbe5 1px, transparent 1px),
+      radial-gradient(circle, #b8e8d8 0.5px, transparent 0.5px);
+    background-size: 28px 28px, 28px 28px;
+    background-position: 0 0, 14px 14px;
+  }
+
+  /* ── Roadmap yellow dash animation ── */
+  .roadmap-dashes {
+    animation: roadmap-dash-scroll 15s linear infinite;
+  }
+
+  /* ── Hide scrollbar for horizontal tab strips ── */
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+@keyframes roadmap-dash-scroll {
+  to {
+    stroke-dashoffset: -200;
+  }
+}
+
+/* ── Featured section gradient mesh drift ── */
+@keyframes mesh-drift-1 {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(30px, -20px); }
+}
+@keyframes mesh-drift-2 {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(-25px, 15px); }
+}
+@keyframes mesh-drift-3 {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(15px, 25px); }
+}
+
+@layer utilities {
+  .animate-mesh-drift-1 {
+    animation: mesh-drift-1 20s ease-in-out infinite;
+  }
+  .animate-mesh-drift-2 {
+    animation: mesh-drift-2 25s ease-in-out infinite;
+  }
+  .animate-mesh-drift-3 {
+    animation: mesh-drift-3 22s ease-in-out infinite;
+  }
+}
+
+/* ── Build log floating node animations ── */
+@keyframes float-gentle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-14px); }
+}
+@keyframes float-gentle-alt {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(12px); }
+}
+@keyframes pulse-ring {
+  0% { transform: scale(1); opacity: 0.4; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+
+@layer utilities {
+  .animate-float-gentle {
+    animation: float-gentle 6s ease-in-out infinite;
+  }
+  .animate-float-gentle-alt {
+    animation: float-gentle-alt 8s ease-in-out infinite;
+  }
+  .animate-pulse-ring {
+    animation: pulse-ring 3s cubic-bezier(0, 0, 0.2, 1) infinite;
+  }
+}
+
+/* ── Contact map radar animations ── */
+@keyframes radar-ping {
+  0% {
+    transform: scale(1);
+    opacity: 0.4;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+@keyframes radar-ping-sm {
+  0% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+
+@keyframes radar-scan {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(12);
+    opacity: 0;
+  }
+}
+
+@layer utilities {
+  .animate-radar-ping {
+    animation: radar-ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+  }
+
+  .animate-radar-ping-sm {
+    animation: radar-ping-sm 2s cubic-bezier(0, 0, 0.2, 1) infinite 0.4s;
+  }
+
+  .animate-radar-scan {
+    animation: radar-scan 3s cubic-bezier(0, 0, 0.2, 1) infinite;
+  }
+}
+
+/* ── BuildLog radar sweep + isobar animations ── */
+@keyframes radar-sweep {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes isobar-flow {
+  from { stroke-dashoffset: 0; }
+  to   { stroke-dashoffset: -200; }
+}
+
+@layer utilities {
+  .animate-radar-sweep {
+    transform-origin: 210px 210px;
+    animation: radar-sweep 10s linear infinite;
+  }
+  .animate-isobar-flow {
+    animation: isobar-flow 25s linear infinite;
+  }
+}
+
+/* ── Skills marquee scroll ── */
+@keyframes marquee-left {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+@keyframes marquee-right {
+  from { transform: translateX(-50%); }
+  to   { transform: translateX(0); }
+}
+
+/* ── Cert card shimmer border ── */
+@keyframes shimmer-border {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
 }

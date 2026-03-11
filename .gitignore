@@ -39,3 +39,26 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# sensitive / personal / reference folders
+/prep/
+/Resume/
+/Masters/
+/courses:certifications/
+/infra/
+/Projects/
+CLAUDE.md
+DEPLOYMENT.md
+
+# personal photos at root
+YavarPersonalPhoto*.png
+PortfolioTemplate.png
+refer.png
+
+# public documents (keep only resume)
+public/GraphCast_Presentation_YavarKhan.pdf
+public/YavarKhan_ML_Resume.pdf
+public/YavarKhan_MS_Degree.pdf
+public/YavarKhan_OfficialTranscript.pdf
+public/YavarKhan_ResumeAI_ML.pdf
+public/YavarKhan_TranscriptMS_Unoff.pdf
