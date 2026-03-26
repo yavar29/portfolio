@@ -456,7 +456,7 @@ export const roadmapMilestones: RoadmapMilestone[] = [
     icon: "Rocket",
     isActive: true,
     story:
-      "An agentic AI system that transforms raw meteorological data into expert-level weather intelligence. Instead of navigating fragmented weather APIs, parsing raw JSON from MCP servers, or decoding NetCDF model outputs, users interact through natural language and receive scientifically grounded analysis, complete with reasoning sourced from NOAA research, NASA atmospheric studies, and peer-reviewed climate science.",
+      "An agentic AI system that transforms raw meteorological data into expert-level weather intelligence. Instead of manually querying weather APIs, parsing raw JSON, or cross-referencing climate research, users interact through natural language and receive scientifically grounded analysis with dynamic visualizations, powered by multi-agent orchestration and reasoning sourced from NOAA research, NASA atmospheric studies, and peer-reviewed climate science.",
     collaborator: {
       name: "Ishita Srivastava",
       context: "~8 years of experience at NCAR in atmospheric research",
@@ -466,8 +466,9 @@ export const roadmapMilestones: RoadmapMilestone[] = [
     metrics: [
       "Multi-Agent Architecture",
       "Corrective RAG with Vision Grounding",
-      "Vaisala Xweather MCP",
-      "Cross-Model Eval Pipeline",
+      "Dependency-Aware Parallel Execution",
+      "LLM-Generated Visualization",
+      "GCP Cloud Run",
     ],
   },
 ];
@@ -488,6 +489,24 @@ export interface BuildLogMilestone {
   entries: BuildLogEntry[];
 }
 
+export interface BuildLogKeyStats {
+  commits: string;
+  agents: string;
+  ragVectors: string;
+  vizPivots: string;
+  prodCost: string;
+  liveUrl: string;
+}
+
+export const buildLogKeyStats: BuildLogKeyStats = {
+  commits: "100+",
+  agents: "7",
+  ragVectors: "429",
+  vizPivots: "3",
+  prodCost: "$3-8/mo",
+  liveUrl: "weather-wise.ai",
+};
+
 export const buildLog: BuildLogMilestone[] = [
   {
     milestone: "Foundation",
@@ -496,38 +515,14 @@ export const buildLog: BuildLogMilestone[] = [
       {
         title: "Xweather MCP Integration",
         description:
-          "Implemented WeatherAgent with LangChain MCP adapters using streamable HTTP transport, exposing 16 weather tools including forecasts, air quality, and alerts.",
-        tags: ["LangGraph", "MCP", "Xweather", "Pydantic", "Async"],
+          "Real-time weather tools (forecasts, air quality, alerts, raster maps) connected via MCP with auth and tool filtering.",
+        tags: ["MCP", "LangGraph", "Pydantic", "Async"],
       },
       {
-        title: "MCP Bridge & Calculator Tool",
+        title: "Sandboxed Python Calculator",
         description:
-          "Created an MCP bridge connecting to the remote Xweather endpoint via streamable HTTP with query-param auth, plus a numexpr-backed calculator for unit conversions.",
-        tags: ["MCP", "numexpr", "Tool Use", "Streamable HTTP"],
-      },
-      {
-        title: "Intent Router & Agent Graph",
-        description:
-          "Built an LLM-powered intent classification layer with structured-output routing and wired the full LangGraph agent graph with intent-specific system prompts and dynamic tool binding.",
-        tags: ["LangGraph", "Structured Output", "Intent Classification"],
-      },
-    ],
-  },
-  {
-    milestone: "RAG & Knowledge Pipeline",
-    status: "shipped",
-    entries: [
-      {
-        title: "Knowledge Ingestion & Pinecone Vector Store",
-        description:
-          "Built a full ingestion pipeline for atmospheric science documents (NOAA, NASA, AMS, NCA5) with PDF parsing, recursive chunking, and embedding into Pinecone — 429+ vectors for production-grade semantic retrieval.",
-        tags: ["RAG", "Pinecone", "Embeddings", "PDF Parsing"],
-      },
-      {
-        title: "Corrective RAG with Vision Grounding",
-        description:
-          "Implemented a self-correcting retrieval pipeline: LLM grades chunk relevance, triggers query reformulation and re-retrieval on low scores, and uses Claude Vision to ground numerical claims against source charts and images.",
-        tags: ["Corrective RAG", "Vision Grounding", "Re-retrieval", "Claude"],
+          "AST-validated execution environment for math and statistical operations on weather data.",
+        tags: ["Python AST", "Sandboxing", "Security"],
       },
     ],
   },
@@ -536,34 +531,88 @@ export const buildLog: BuildLogMilestone[] = [
     status: "shipped",
     entries: [
       {
-        title: "Specialized Agent Subgraphs",
+        title: "Planner-Executor with Parallel Fan-Out",
         description:
-          "Refactored from a single shared worker into specialized agents — each with its own tool set, system prompt, and isolated execution context — enabling independent reasoning per domain and parallel execution for multi-part queries.",
-        tags: ["LangGraph", "Multi-Agent", "Subgraphs", "Parallel Execution"],
+          "7 specialized agents with dependency-aware DAG execution and dynamic parallel fan-out/fan-in.",
+        tags: ["LangGraph", "Send API", "DAG Execution", "Parallel Processing"],
       },
       {
-        title: "Session Memory Checkpointing",
+        title: "Dynamic Model Routing",
         description:
-          "Implemented LangGraph checkpointing for multi-turn conversations — full graph state serialized after every node execution, preserving internal agent state, retrieved context, and user preferences across turns.",
-        tags: ["LangGraph", "Checkpointing", "State Management", "Multi-turn"],
+          "Per-agent model selection based on task complexity, balancing reasoning quality against cost and latency.",
+        tags: ["Model Selection", "Cost Optimization"],
+      },
+      {
+        title: "Dual Data Pipeline",
+        description:
+          "Structured JSON for computation agents, LLM-formatted text for synthesis. Clean separation eliminated data parsing failures across the pipeline.",
+        tags: ["Data Architecture", "Pipeline Design"],
+      },
+      {
+        title: "Session Persistence",
+        description:
+          "Stateful multi-turn conversations with full graph checkpointing and context-aware follow-ups.",
+        tags: ["LangGraph", "Checkpointing", "State Management"],
       },
     ],
   },
   {
-    milestone: "Observability & Evaluation",
+    milestone: "RAG & Knowledge Pipeline",
     status: "shipped",
     entries: [
       {
-        title: "LangSmith Agent Tracing",
+        title: "Pinecone Vector Store",
         description:
-          "Integrated LangSmith SDK with config validation, run metadata helpers, and tracing tags across the full agent graph for end-to-end trace inspection.",
-        tags: ["LangSmith", "Observability", "Tracing"],
+          "Multimodal ingestion pipeline for climate research PDFs with vision-based image understanding and serverless vector retrieval.",
+        tags: ["RAG", "Pinecone", "Embeddings", "Vision"],
+      },
+    ],
+  },
+  {
+    milestone: "Visualization",
+    status: "shipped",
+    entries: [
+      {
+        title: "Dynamic LLM-Generated Charts",
+        description:
+          "The LLM analyzes query complexity and generates complete ECharts configurations autonomously, from simple bar charts to multi-series comparisons, with no templates or predefined chart logic.",
+        tags: ["ECharts", "Structured Output", "Generative Visualization"],
+      },
+    ],
+  },
+  {
+    milestone: "Frontend & Observability",
+    status: "shipped",
+    entries: [
+      {
+        title: "Thinking Timeline",
+        description:
+          "Real-time reasoning disclosure with dynamic progress headers and expandable tool call details via WebSocket streaming.",
+        tags: ["React", "WebSocket", "Framer Motion"],
       },
       {
-        title: "Frontend UI & LangSmith Integration",
+        title: "Trace Visualizer",
         description:
-          "Built the conversational interface in React + TypeScript with Tailwind CSS, connected to the agent backend via FastAPI WebSocket for real-time streaming, and integrated LangSmith tracing into responses for end-to-end observability and testing.",
-        tags: ["React", "TypeScript", "Tailwind CSS", "FastAPI", "WebSocket", "LangSmith"],
+          "On-demand agent execution flow diagrams for end-to-end debugging.",
+        tags: ["LangSmith", "Observability"],
+      },
+    ],
+  },
+  {
+    milestone: "Production",
+    status: "shipped",
+    entries: [
+      {
+        title: "GCP Cloud Run",
+        description:
+          "Terraform-managed deployment with CI/CD, secret management, and custom domain. Single container serves full stack.",
+        tags: ["GCP", "Terraform", "Cloud Build", "Cloudflare"],
+      },
+      {
+        title: "Prompt Caching",
+        description:
+          "Native cache control to reduce token costs on repeated system prompts across turns.",
+        tags: ["Prompt Caching", "Cost Optimization"],
       },
     ],
   },
@@ -572,16 +621,16 @@ export const buildLog: BuildLogMilestone[] = [
     status: "in_progress",
     entries: [
       {
-        title: "Multi-Agent Specialization",
+        title: "Evaluation Framework",
         description:
-          "Breaking the monolithic agent into specialized sub-agents for forecasts, alerts, climate science Q&A, and travel planning, orchestrated by a supervisor node in LangGraph.",
-        tags: ["LangGraph", "Multi-Agent", "Supervisor Pattern"],
+          "Golden test suite with automated scoring for accuracy, grounding, and tool-use correctness.",
+        tags: ["Evaluation", "LangSmith"],
       },
       {
-        title: "Evaluation Framework & Golden Test Suite",
+        title: "Migration to Claude Code Native",
         description:
-          "Building a structured evaluation harness with golden question–answer pairs and automated scoring to measure accuracy, grounding, and tool-use correctness across agent responses.",
-        tags: ["Evaluation", "Testing", "LangSmith", "Quality"],
+          "Replacing LangGraph orchestration with Anthropic's first-party agent SDK for native tool use and MCP integration.",
+        tags: ["Claude Code", "Agent SDK"],
       },
     ],
   },
@@ -590,28 +639,22 @@ export const buildLog: BuildLogMilestone[] = [
     status: "next",
     entries: [
       {
-        title: "Cross-Model Evaluation Pipeline",
+        title: "RAG Pipeline Upgrade",
         description:
-          "Automated eval harness benchmarking response quality across Claude, GPT, and Gemini on meteorological accuracy, routing precision, and citation quality.",
-        tags: ["Evaluation", "Multi-Model", "Benchmarking"],
-      },
-      {
-        title: "Production Deployment",
-        description:
-          "Deploying to GCP Cloud Run with auto-scaling, Redis caching for repeated weather queries, WebSocket streaming for real-time responses, and token-based API auth with rate limiting.",
-        tags: ["GCP", "Cloud Run", "Redis", "WebSocket", "Auth"],
+          "Exploring Gemini 2 embeddings, BM25 hybrid search, reranking, and agentic/graph RAG for improved retrieval accuracy.",
+        tags: ["RAG", "Hybrid Search", "Reranking", "Graph RAG"],
       },
       {
         title: "Expanded MCP Ecosystem",
         description:
-          "Integrating additional MCP servers — Fire Impact MCP for wildfire spread modeling and evacuation analysis, Air Quality MCP for AQI monitoring, and NOAA Tides & Currents for maritime data.",
-        tags: ["Fire Impact MCP", "Air Quality", "Multi-MCP"],
+          "Additional MCP servers for wildfire impact, air quality, and maritime data.",
+        tags: ["Multi-MCP", "Tool Ecosystem"],
       },
       {
-        title: "Dynamic Visualizations",
+        title: "Cross-Model Evaluation",
         description:
-          "Interactive weather maps with spatial data overlays and real-time chart generation for temperature trends, wind roses, and comparative dashboards.",
-        tags: ["Mapbox", "D3.js", "Data Visualization"],
+          "Automated benchmarking across multiple LLM providers on domain accuracy and routing precision.",
+        tags: ["Evaluation", "Multi-Model"],
       },
     ],
   },
@@ -634,19 +677,20 @@ export const skillCategories: SkillCategory[] = [
     skills: [
       "PyTorch", "TensorFlow", "Scikit-learn", "LLMs", "RAG", "Multi-Agent Systems",
       "Prompt Engineering", "Transformers", "FAISS", "LangChain", "LangGraph", "MCP",
+      "Claude API", "Anthropic SDK", "Structured Output", "Agentic AI",
     ],
   },
   {
     title: "Data & Retrieval",
-    skills: ["Pandas", "NumPy", "ElasticSearch", "ETL Pipelines", "Embedding Pipelines", "PostgreSQL", "MySQL"],
+    skills: ["Pandas", "NumPy", "ElasticSearch", "ETL Pipelines", "Embedding Pipelines", "PostgreSQL", "MySQL", "Pinecone", "Vector Databases", "ChromaDB"],
   },
   {
     title: "Cloud & Deployment",
-    skills: ["AWS Lambda", "S3", "IAM", "CloudWatch", "Vertex AI", "Docker", "Hugging Face Spaces", "CI/CD"],
+    skills: ["AWS Lambda", "S3", "IAM", "CloudWatch", "GCP Cloud Run", "Terraform", "Cloud Build", "Secret Manager", "Vertex AI", "Docker", "Hugging Face Spaces", "CI/CD"],
   },
   {
     title: "Tools & Platforms",
-    skills: ["Git", "JIRA", "Kibana", "Postman", "Gradio", "Streamlit", "Confluence", "Linux/Unix"],
+    skills: ["Git", "JIRA", "Kibana", "Postman", "Gradio", "Streamlit", "Confluence", "Linux/Unix", "LangSmith", "Claude Code"],
   },
 ];
 

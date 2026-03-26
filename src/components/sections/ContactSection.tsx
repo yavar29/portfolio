@@ -1,10 +1,25 @@
 "use client";
 
-import { useState } from "react";
-import { Mail, MapPin, Download, Send, FileText, Linkedin, ArrowUpRight } from "lucide-react";
+import { useState, useRef, useCallback, useEffect, type FormEvent } from "react";
+import { Mail, MapPin, Download, Send, FileText, Linkedin, ArrowUpRight, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import AnimateOnScroll from "@/components/ui/AnimateOnScroll";
-import { SITE, SOCIAL_LINKS } from "@/lib/constants";
+import { SITE, SOCIAL_LINKS, TURNSTILE_SITE_KEY } from "@/lib/constants";
+
+declare global {
+  interface Window {
+    turnstile?: {
+      render: (
+        container: string | HTMLElement,
+        options: Record<string, unknown>
+      ) => string;
+      reset: (widgetId?: string) => void;
+      remove: (widgetId?: string) => void;
+    };
+  }
+}
+
+type FormStatus = "idle" | "submitting" | "success" | "error";
 
 const CATEGORIES = [
   { label: "Collaboration", value: "Collaboration" },
@@ -15,6 +30,97 @@ const CATEGORIES = [
 
 export default function ContactSection() {
   const [category, setCategory] = useState("Collaboration");
+  const [status, setStatus] = useState<FormStatus>("idle");
+  const [errorMessage, setErrorMessage] = useState("");
+  const formRef = useRef<HTMLFormElement>(null);
+  const turnstileRef = useRef<HTMLDivElement>(null);
+  const widgetIdRef = useRef<string | null>(null);
+
+  // Explicitly render Turnstile after mount — waits for script to load
+  useEffect(() => {
+    const container = turnstileRef.current;
+    if (!container) return;
+
+    const renderWidget = () => {
+      if (!window.turnstile || widgetIdRef.current) return;
+      widgetIdRef.current = window.turnstile.render(container, {
+        sitekey: TURNSTILE_SITE_KEY,
+        theme: "dark",
+        size: "flexible",
+      });
+    };
+
+    // If script already loaded, render immediately; otherwise poll briefly
+    if (window.turnstile) {
+      renderWidget();
+    } else {
+      const interval = setInterval(() => {
+        if (window.turnstile) {
+          clearInterval(interval);
+          renderWidget();
+        }
+      }, 200);
+      return () => clearInterval(interval);
+    }
+  }, []);
+
+  const handleSubmit = useCallback(
+    async (e: FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      setStatus("submitting");
+      setErrorMessage("");
+
+      const formData = new FormData(e.currentTarget);
+
+      // Verify Turnstile token exists
+      const turnstileToken = formData.get("cf-turnstile-response");
+      if (!turnstileToken) {
+        setStatus("error");
+        setErrorMessage("Please complete the verification challenge.");
+        return;
+      }
+
+      // Build JSON payload
+      const payload: Record<string, string> = {};
+      formData.forEach((value, key) => {
+        payload[key] = value.toString();
+      });
+
+      try {
+        const res = await fetch(`https://formsubmit.co/ajax/${SITE.email}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
+
+        if (res.ok) {
+          setStatus("success");
+          formRef.current?.reset();
+          setCategory("Collaboration");
+        } else {
+          const data = await res.json().catch(() => null);
+          setStatus("error");
+          setErrorMessage(
+            data?.message || "Something went wrong. Please try again."
+          );
+        }
+      } catch {
+        setStatus("error");
+        setErrorMessage(
+          "Network error. Please check your connection and try again."
+        );
+      }
+
+      // Reset Turnstile widget for retry
+      if (widgetIdRef.current) {
+        window.turnstile?.reset(widgetIdRef.current);
+      }
+    },
+    []
+  );
 
   return (
     <section
@@ -75,7 +181,7 @@ export default function ContactSection() {
         </AnimateOnScroll>
 
         {/* ── Two-Column Layout ── */}
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-5 items-stretch">
 
           {/* ═══ Left: Contact Info (2/5) ═══ */}
           <AnimateOnScroll className="lg:col-span-2 flex flex-col gap-4">
@@ -155,7 +261,7 @@ export default function ContactSection() {
             </a>
 
             {/* Map tile */}
-            <div className="relative overflow-hidden rounded-2xl border border-white/[0.07] min-h-[180px] transition-[border-color] duration-300 hover:border-brand-primary/30">
+            <div className="relative overflow-hidden rounded-2xl border border-white/[0.07] min-h-[180px] flex-1 transition-[border-color] duration-300 hover:border-brand-primary/30">
               <img
                 src="/images/san-jose-map.jpg"
                 alt="Map of San Jose, CA"
@@ -194,14 +300,12 @@ export default function ContactSection() {
               </p>
 
               <form
-                action={`https://formsubmit.co/${SITE.email}`}
-                method="POST"
+                ref={formRef}
+                onSubmit={handleSubmit}
                 className="space-y-6"
               >
                 <input type="hidden" name="_subject" value={`Portfolio Contact: ${category}`} />
-                <input type="hidden" name="_captcha" value="false" />
                 <input type="hidden" name="_template" value="table" />
-                <input type="hidden" name="_next" value="https://yavarkhan.me" />
                 <input type="hidden" name="category" value={category} />
 
                 {/* Category selector */}
@@ -239,7 +343,8 @@ export default function ContactSection() {
                       name="name"
                       type="text"
                       required
-                      className="w-full rounded-xl bg-white/[0.05] border border-white/[0.08] px-4 py-3 text-sm text-white placeholder:text-slate-600 outline-none transition-all duration-200 focus:border-brand-primary/50 focus:bg-white/[0.07] focus:ring-1 focus:ring-brand-primary/20"
+                      disabled={status === "submitting"}
+                      className="w-full rounded-xl bg-white/[0.05] border border-white/[0.08] px-4 py-3 text-sm text-white placeholder:text-slate-600 outline-none transition-all duration-200 focus:border-brand-primary/50 focus:bg-white/[0.07] focus:ring-1 focus:ring-brand-primary/20 disabled:opacity-50"
                       placeholder="Your name"
                     />
                   </div>
@@ -252,7 +357,8 @@ export default function ContactSection() {
                       name="email"
                       type="email"
                       required
-                      className="w-full rounded-xl bg-white/[0.05] border border-white/[0.08] px-4 py-3 text-sm text-white placeholder:text-slate-600 outline-none transition-all duration-200 focus:border-brand-primary/50 focus:bg-white/[0.07] focus:ring-1 focus:ring-brand-primary/20"
+                      disabled={status === "submitting"}
+                      className="w-full rounded-xl bg-white/[0.05] border border-white/[0.08] px-4 py-3 text-sm text-white placeholder:text-slate-600 outline-none transition-all duration-200 focus:border-brand-primary/50 focus:bg-white/[0.07] focus:ring-1 focus:ring-brand-primary/20 disabled:opacity-50"
                       placeholder="your@email.com"
                     />
                   </div>
@@ -268,23 +374,79 @@ export default function ContactSection() {
                     name="message"
                     rows={5}
                     required
-                    className="w-full rounded-xl bg-white/[0.05] border border-white/[0.08] px-4 py-3 text-sm text-white placeholder:text-slate-600 outline-none transition-all duration-200 focus:border-brand-primary/50 focus:bg-white/[0.07] focus:ring-1 focus:ring-brand-primary/20 resize-none"
+                    disabled={status === "submitting"}
+                    className="w-full rounded-xl bg-white/[0.05] border border-white/[0.08] px-4 py-3 text-sm text-white placeholder:text-slate-600 outline-none transition-all duration-200 focus:border-brand-primary/50 focus:bg-white/[0.07] focus:ring-1 focus:ring-brand-primary/20 resize-none disabled:opacity-50"
                     placeholder="Tell me about your project or opportunity..."
                   />
                 </div>
 
+                {/* Cloudflare Turnstile — explicitly rendered */}
+                <div ref={turnstileRef} className="[&_iframe]:rounded-lg [&_iframe]:border [&_iframe]:border-white/[0.08]" />
+
                 {/* Submit */}
                 <button
                   type="submit"
-                  className="group relative w-full cursor-pointer overflow-hidden rounded-xl bg-gradient-to-r from-brand-primary to-violet-500 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-brand-primary/20 transition-all duration-300 hover:shadow-xl hover:shadow-brand-primary/30"
+                  disabled={status === "submitting"}
+                  className={cn(
+                    "group relative w-full cursor-pointer overflow-hidden rounded-xl px-6 py-3.5 text-sm font-semibold text-white shadow-lg transition-all duration-300",
+                    status === "submitting"
+                      ? "bg-brand-primary/50 cursor-not-allowed shadow-none"
+                      : "bg-gradient-to-r from-brand-primary to-violet-500 shadow-brand-primary/20 hover:shadow-xl hover:shadow-brand-primary/30"
+                  )}
                 >
                   <span className="relative z-10 inline-flex items-center justify-center gap-2">
-                    <Send size={16} className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                    Send Message
+                    {status === "submitting" ? (
+                      <>
+                        <Loader2 size={16} className="animate-spin" />
+                        Sending...
+                      </>
+                    ) : (
+                      <>
+                        <Send size={16} className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                        Send Message
+                      </>
+                    )}
                   </span>
-                  <span className="absolute inset-0 bg-gradient-to-r from-violet-500 to-cyan-500 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                  {status !== "submitting" && (
+                    <span className="absolute inset-0 bg-gradient-to-r from-violet-500 to-cyan-500 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                  )}
                 </button>
               </form>
+
+              {/* Success message */}
+              {status === "success" && (
+                <div className="mt-6 flex items-start gap-3 rounded-xl border border-emerald-500/20 bg-emerald-500/[0.07] p-4">
+                  <CheckCircle size={20} className="mt-0.5 shrink-0 text-emerald-400" />
+                  <div>
+                    <p className="text-sm font-semibold text-emerald-300">
+                      Message sent successfully!
+                    </p>
+                    <p className="mt-1 text-xs text-slate-400">
+                      Your message has been sent to Yavar. I&apos;ll get back to you within 24 hours.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setStatus("idle")}
+                      className="mt-3 text-xs font-medium text-emerald-400 underline underline-offset-2 hover:text-emerald-300 transition-colors cursor-pointer"
+                    >
+                      Send another message
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Error message */}
+              {status === "error" && (
+                <div className="mt-6 flex items-start gap-3 rounded-xl border border-red-500/20 bg-red-500/[0.07] p-4">
+                  <AlertCircle size={20} className="mt-0.5 shrink-0 text-red-400" />
+                  <div>
+                    <p className="text-sm font-semibold text-red-300">
+                      Failed to send message
+                    </p>
+                    <p className="mt-1 text-xs text-slate-400">{errorMessage}</p>
+                  </div>
+                </div>
+              )}
             </div>
           </AnimateOnScroll>
         </div>

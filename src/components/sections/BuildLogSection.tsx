@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, Loader2, Clock, ChevronDown } from "lucide-react";
 import AnimateOnScroll from "@/components/ui/AnimateOnScroll";
-import { buildLog, type BuildLogStatus } from "@/lib/data";
+import { buildLog, buildLogKeyStats, type BuildLogStatus } from "@/lib/data";
 
 /* ─── Status configuration ─── */
 const STATUS_CFG: Record<
@@ -378,7 +378,7 @@ export default function BuildLogSection() {
                 <span className="text-brand-dark/40">Build Log.</span>
               </h2>
               <p className="mt-5 max-w-lg text-base sm:text-lg text-brand-dark/60 leading-relaxed">
-                Key milestones shipped so far — and what&apos;s coming next.
+                Key milestones shipped so far and what&apos;s coming next.
               </p>
             </div>
 
@@ -406,6 +406,47 @@ export default function BuildLogSection() {
               </div>
             </div>
 
+          </div>
+        </AnimateOnScroll>
+
+        {/* ── Key Stats Strip ── */}
+        <AnimateOnScroll>
+          <div
+            className="mb-10 rounded-xl px-5 py-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4"
+            style={{
+              background: "rgba(42, 36, 56, 0.70)",
+              backdropFilter: "blur(16px)",
+              border: "1px solid rgba(255, 255, 255, 0.08)",
+            }}
+          >
+            {[
+              { value: buildLogKeyStats.commits, label: "Commits" },
+              { value: buildLogKeyStats.agents, label: "Agents (parallel DAG)" },
+              { value: buildLogKeyStats.ragVectors, label: "RAG Vectors" },
+              { value: buildLogKeyStats.vizPivots, label: "Viz Pivots" },
+              { value: buildLogKeyStats.prodCost, label: "Prod Cost ($0 idle)" },
+              { value: buildLogKeyStats.liveUrl, label: "Live", isLink: true },
+            ].map((stat) => (
+              <div key={stat.label} className="flex flex-col items-center text-center gap-1">
+                {"isLink" in stat && stat.isLink ? (
+                  <a
+                    href={`https://${stat.value}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-lg sm:text-xl font-black text-emerald-400 font-[family-name:var(--font-heading)] leading-none hover:text-emerald-300 transition-colors underline underline-offset-2 decoration-emerald-400/30"
+                  >
+                    {stat.value}
+                  </a>
+                ) : (
+                  <span className="text-lg sm:text-xl font-black text-white font-[family-name:var(--font-heading)] leading-none tabular-nums">
+                    {stat.value}
+                  </span>
+                )}
+                <span className="text-[9px] font-semibold uppercase tracking-[0.15em] text-white/40">
+                  {stat.label}
+                </span>
+              </div>
+            ))}
           </div>
         </AnimateOnScroll>
 

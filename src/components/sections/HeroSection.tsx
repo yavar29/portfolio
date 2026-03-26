@@ -35,6 +35,7 @@ const floatingTags: FloatingTag[] = [
   { label: "LangGraph",      x: "78%", y: "54%", delay: 1.5, size: "md" },
   // Bottom row — wide and low
   { label: "RAG Pipelines",  x: "3%",  y: "68%", delay: 1.2, size: "md" },
+  { label: "Claude Code",   x: "8%",  y: "78%", delay: 0.8, size: "md" },
   { label: "Multi-Agent AI", x: "75%", y: "66%", delay: 0.3, size: "lg" },
   { label: "LLMOps",         x: "86%", y: "76%", delay: 0.5, size: "md" },
 ];

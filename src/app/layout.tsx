@@ -95,6 +95,11 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
+        <script
+          src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
+          async
+          defer
+        />
       </head>
       <body className={`${dmSans.variable} ${spaceGrotesk.variable} ${playfair.variable} ${jetbrainsMono.variable} antialiased`} suppressHydrationWarning>
         <Navbar />
