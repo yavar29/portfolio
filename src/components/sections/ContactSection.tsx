@@ -245,7 +245,7 @@ export default function ContactSection() {
 
             {/* Resume download */}
             <a
-              href="/YavarKhan_ResumeAI_ML.pdf"
+              href="/YavarKhan_Resume.pdf"
               target="_blank"
               rel="noopener noreferrer"
               className="group flex items-center gap-4 rounded-2xl border border-brand-primary/20 bg-brand-primary/[0.05] p-5 backdrop-blur-sm transition-all duration-300 hover:border-brand-primary/40 hover:bg-brand-primary/[0.09]"

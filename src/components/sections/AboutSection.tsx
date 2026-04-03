@@ -277,7 +277,7 @@ export default function AboutSection() {
             {/* ── Resume CTA ── */}
             <motion.div custom={3} variants={paragraphVariants} className="mt-7">
               <a
-                href="/YavarKhan_ResumeAI_ML.pdf"
+                href="/YavarKhan_Resume.pdf"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 text-sm font-semibold text-brand-primary hover:text-brand-dark transition-colors font-[family-name:var(--font-heading)]"

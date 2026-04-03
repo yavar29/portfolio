@@ -56,7 +56,7 @@ export default function Navbar() {
 
           {/* Download CV button */}
           <a
-            href="/YavarKhan_ResumeAI_ML.pdf"
+            href="/YavarKhan_Resume.pdf"
             className="hidden md:inline-flex items-center gap-2 rounded-full bg-brand-dark text-white px-5 py-2 text-sm font-semibold hover:bg-brand-dark/85 transition-colors"
           >
             Download CV
