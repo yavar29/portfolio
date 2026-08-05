@@ -1,0 +1,19 @@
+# Provider plugins — ~109 MB of binaries, re-fetched by `terraform init`
+.terraform/
+
+# State: never commit to a public repo. It records every resource attribute
+# and can capture sensitive values. Use a remote backend for durability.
+*.tfstate
+*.tfstate.*
+.terraform.tfstate.lock.info
+
+# Variable files may carry secrets
+*.tfvars
+*.tfvars.json
+
+# Saved plans embed full state
+*.tfplan
+
+# Crash logs
+crash.log
+crash.*.log

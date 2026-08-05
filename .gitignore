@@ -45,15 +45,14 @@ next-env.d.ts
 /Resume/
 /Masters/
 /courses:certifications/
-/infra/
 /Projects/
 CLAUDE.md
 DEPLOYMENT.md
 
-# personal photos at root
-YavarPersonalPhoto*.png
-PortfolioTemplate.png
-refer.png
+# personal photos at root (leading slash: must NOT match public/images/*)
+/YavarPersonalPhoto*.png
+/PortfolioTemplate.png
+/refer.png
 
 # public documents (keep only resume)
 public/GraphCast_Presentation_YavarKhan.pdf
