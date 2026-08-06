@@ -86,11 +86,18 @@ resource "google_compute_global_address" "website" {
 
 # ─── Google-managed SSL certificate ────────────────────────────────────────
 
-resource "google_compute_managed_ssl_certificate" "website" {
-  name = "website-ssl-cert-v2"
+# v2 stuck in FAILED_NOT_VISIBLE after the 2026-08-05 billing outage: validation
+# kept failing while the LB served nothing, and GCP does not reliably retry once
+# a managed cert enters that state. v3 is a clean provisioning attempt.
+resource "google_compute_managed_ssl_certificate" "website_v3" {
+  name = "website-ssl-cert-v3"
 
   managed {
     domains = [var.domain, "www.${var.domain}"]
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
@@ -132,9 +139,17 @@ resource "google_compute_url_map" "http_redirect" {
 # ─── HTTPS target proxy ────────────────────────────────────────────────────
 
 resource "google_compute_target_https_proxy" "website" {
-  name             = "website-https-proxy"
-  url_map          = google_compute_url_map.website.id
-  ssl_certificates = [google_compute_managed_ssl_certificate.website.id]
+  name    = "website-https-proxy"
+  url_map = google_compute_url_map.website.id
+
+  # PHASE 1 (current): v2 is listed first and keeps serving -- it is still a
+  # valid cert until 2026-08-23 -- while v3 provisions, so HTTPS never drops.
+  # PHASE 2: once v3 reports ACTIVE, delete the v2 literal below, apply, then
+  # `gcloud compute ssl-certificates delete website-ssl-cert-v2 --global`.
+  ssl_certificates = [
+    "https://www.googleapis.com/compute/v1/projects/weatherwise-486608/global/sslCertificates/website-ssl-cert-v2",
+    google_compute_managed_ssl_certificate.website_v3.id,
+  ]
 }
 
 # HTTP target proxy (for redirect)
@@ -163,53 +178,13 @@ resource "google_compute_global_forwarding_rule" "http" {
   load_balancing_scheme = "EXTERNAL"
 }
 
-# ─── Cloud Armor security policy ───────────────────────────────────────────
-
-resource "google_compute_security_policy" "website" {
-  name = "website-security-policy"
-
-  # Default: allow all traffic
-  rule {
-    action   = "allow"
-    priority = 2147483647
-
-    match {
-      versioned_expr = "SRC_IPS_V1"
-      config {
-        src_ip_ranges = ["*"]
-      }
-    }
-
-    description = "Default allow rule"
-  }
-
-  # Block common attack patterns via preconfigured WAF rules
-  rule {
-    action   = "deny(403)"
-    priority = 1000
-
-    match {
-      expr {
-        expression = "evaluatePreconfiguredExpr('xss-v33-stable')"
-      }
-    }
-
-    description = "Block XSS attacks"
-  }
-
-  rule {
-    action   = "deny(403)"
-    priority = 1001
-
-    match {
-      expr {
-        expression = "evaluatePreconfiguredExpr('sqli-v33-stable')"
-      }
-    }
-
-    description = "Block SQL injection attacks"
-  }
-}
+# ─── Cloud Armor ────────────────────────────────────────────────────────────
+#
+# Removed 2026-08-05. `google_compute_security_policy.website` was declared here
+# with XSS/SQLi rules but was never attached to anything -- setting
+# `edge_security_policy` on google_compute_backend_bucket.website is what binds
+# a policy, and that was never done. So it inspected zero requests while still
+# billing ~$5-6/month. To reinstate it, re-add the resource AND attach it.
 
 # ─── Outputs ────────────────────────────────────────────────────────────────
 
@@ -219,7 +194,7 @@ output "load_balancer_ip" {
 }
 
 output "ssl_certificate_name" {
-  value       = google_compute_managed_ssl_certificate.website.name
+  value       = google_compute_managed_ssl_certificate.website_v3.name
   description = "SSL certificate resource name"
 }
 
