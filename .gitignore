@@ -54,10 +54,8 @@ DEPLOYMENT.md
 /PortfolioTemplate.png
 /refer.png
 
-# public documents (keep only resume)
-public/GraphCast_Presentation_YavarKhan.pdf
+# Unused document variants — not referenced by src/, so they stay out.
+# Anything src/lib/data.ts links to MUST be tracked, or a fresh clone 404s on it.
 public/YavarKhan_ML_Resume.pdf
-public/YavarKhan_MS_Degree.pdf
-public/YavarKhan_OfficialTranscript.pdf
 public/YavarKhan_ResumeAI_ML.pdf
 public/YavarKhan_TranscriptMS_Unoff.pdf
