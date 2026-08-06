@@ -142,14 +142,12 @@ resource "google_compute_target_https_proxy" "website" {
   name    = "website-https-proxy"
   url_map = google_compute_url_map.website.id
 
-  # PHASE 1 (current): v2 is listed first and keeps serving -- it is still a
-  # valid cert until 2026-08-23 -- while v3 provisions, so HTTPS never drops.
-  # PHASE 2: once v3 reports ACTIVE, delete the v2 literal below, apply, then
-  # `gcloud compute ssl-certificates delete website-ssl-cert-v2 --global`.
-  ssl_certificates = [
-    "https://www.googleapis.com/compute/v1/projects/weatherwise-486608/global/sslCertificates/website-ssl-cert-v2",
-    google_compute_managed_ssl_certificate.website_v3.id,
-  ]
+  # If a managed cert ever gets stuck in FAILED_NOT_VISIBLE again, do not swap
+  # this list straight to the replacement: add the new cert alongside the old,
+  # wait for ACTIVE, then remove the old one. Pointing the proxy at a cert that
+  # is still PROVISIONING drops HTTPS, and :80 is redirect-only so there is no
+  # fallback.
+  ssl_certificates = [google_compute_managed_ssl_certificate.website_v3.id]
 }
 
 # HTTP target proxy (for redirect)
