@@ -5,15 +5,22 @@ import { Download, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NAV_ITEMS, RESUME } from "@/lib/constants";
 
-const SECTION_IDS = NAV_ITEMS.map((item) => item.href.slice(1));
+// The hero ("top") is observed too, so nothing is highlighted while it fills the viewport.
+const SECTION_IDS = ["top", ...NAV_ITEMS.map((item) => item.href.slice(1))];
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState("");
+  const [overHero, setOverHero] = useState(true);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
+    const hero = document.getElementById("top");
+    const onScroll = () => {
+      setScrolled(window.scrollY > 8);
+      // The hero is dark, so the bar switches to light text while it sits over it.
+      setOverHero(!!hero && hero.getBoundingClientRect().bottom > 32);
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -42,17 +49,25 @@ export default function Navbar() {
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
+  const dark = overHero && !open;
+
   return (
     <header
       className={cn(
         "fixed inset-x-0 top-0 z-50 border-b transition-[background-color,border-color] duration-300",
-        scrolled || open
-          ? "border-line bg-paper/90 backdrop-blur-md"
-          : "border-transparent bg-transparent"
+        dark && "on-dark",
+        dark
+          ? scrolled
+            ? "border-white/10 bg-night-deep/85 backdrop-blur-md"
+            : "border-transparent bg-transparent"
+          : "border-line bg-paper/90 backdrop-blur-md"
       )}
     >
       <nav aria-label="Primary" className="container-page flex h-16 items-center justify-between gap-6">
-        <a href="#top" className="font-serif text-[1.375rem] leading-none tracking-tight text-ink">
+        <a
+          href="#top"
+          className={cn("font-serif text-[1.375rem] leading-none tracking-tight", dark ? "text-white" : "text-ink")}
+        >
           Yavar Khan
         </a>
 
@@ -65,8 +80,9 @@ export default function Navbar() {
                   href={item.href}
                   aria-current={isActive ? "true" : undefined}
                   className={cn(
-                    "text-[0.9375rem] transition-colors duration-200 hover:text-ink",
-                    isActive ? "text-ink" : "text-ink-3"
+                    "text-[0.9375rem] transition-colors duration-200",
+                    dark ? "text-on-night-2 hover:text-white" : "hover:text-ink",
+                    !dark && (isActive ? "text-ink" : "text-ink-3")
                   )}
                 >
                   {item.label}
@@ -80,7 +96,10 @@ export default function Navbar() {
           <a
             href={RESUME.href}
             download={RESUME.filename}
-            className="hidden items-center gap-2 rounded-full bg-ink px-4 py-2 text-sm font-medium text-paper transition-colors duration-200 hover:bg-violet-deep sm:inline-flex"
+            className={cn(
+              "hidden items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors duration-200 sm:inline-flex",
+              dark ? "bg-white text-ink hover:bg-violet-wash" : "bg-ink text-paper hover:bg-violet-deep"
+            )}
           >
             <Download aria-hidden className="size-4" />
             Resume
@@ -91,7 +110,10 @@ export default function Navbar() {
             aria-expanded={open}
             aria-controls="mobile-nav"
             aria-label={open ? "Close menu" : "Open menu"}
-            className="-mr-2 grid size-11 place-items-center rounded-full text-ink lg:hidden"
+            className={cn(
+              "-mr-2 grid size-11 place-items-center rounded-full lg:hidden",
+              dark ? "text-white" : "text-ink"
+            )}
           >
             {open ? <X aria-hidden className="size-5" /> : <Menu aria-hidden className="size-5" />}
           </button>
