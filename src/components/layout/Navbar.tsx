@@ -58,7 +58,7 @@ export default function Navbar() {
         dark && "on-dark",
         dark
           ? scrolled
-            ? "border-white/10 bg-night-deep/85 backdrop-blur-md"
+            ? "border-white/10 bg-night/80 backdrop-blur-md"
             : "border-transparent bg-transparent"
           : "border-line bg-paper/90 backdrop-blur-md"
       )}
@@ -98,7 +98,7 @@ export default function Navbar() {
             download={RESUME.filename}
             className={cn(
               "hidden items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors duration-200 sm:inline-flex",
-              dark ? "bg-white text-ink hover:bg-violet-wash" : "bg-ink text-paper hover:bg-violet-deep"
+              dark ? "bg-white text-ink hover:bg-mist" : "bg-ink text-paper hover:bg-ink-2"
             )}
           >
             <Download aria-hidden className="size-4" />

@@ -20,7 +20,7 @@ const TOPICS = ["Hiring", "Collaboration", "Just saying hi"];
 const TURNSTILE_SRC = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
 
 const fieldClass =
-  "w-full rounded-xl border border-white/12 bg-white/[0.04] px-4 py-3 text-[0.9688rem] text-on-night outline-none transition-colors duration-200 placeholder:text-on-night-2/60 focus:border-violet-glow focus:bg-white/[0.06] disabled:opacity-50";
+  "w-full rounded-xl border border-white/12 bg-white/[0.04] px-4 py-3 text-[0.9688rem] text-on-night outline-none transition-colors duration-200 placeholder:text-on-night-2/60 focus:border-white/60 focus:bg-white/[0.06] disabled:opacity-50";
 
 export default function ContactSection() {
   const [topic, setTopic] = useState(TOPICS[0]);
@@ -107,7 +107,7 @@ export default function ContactSection() {
   const busy = status === "submitting";
 
   return (
-    <section id="contact" className="bg-night text-on-night">
+    <section id="contact" className="on-dark bg-night text-on-night">
       <div className="container-page section-pad grid gap-14 lg:grid-cols-12 lg:gap-12">
         <div className="lg:col-span-5">
           <h2 className="t-h2">Get in touch</h2>
@@ -171,9 +171,9 @@ export default function ContactSection() {
                 <label
                   key={t}
                   className={cn(
-                    "cursor-pointer rounded-full border px-4 py-2 text-sm transition-colors duration-200 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-violet-glow",
+                    "cursor-pointer rounded-full border px-4 py-2 text-sm transition-colors duration-200 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-on-night",
                     topic === t
-                      ? "border-violet-glow bg-violet-glow/15 text-on-night"
+                      ? "border-on-night bg-white/10 text-on-night"
                       : "border-white/12 text-on-night-2 hover:border-white/30"
                   )}
                 >
@@ -219,7 +219,7 @@ export default function ContactSection() {
             <button
               type="submit"
               disabled={busy}
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-violet px-6 py-3 text-[0.9375rem] font-medium text-white transition-colors duration-200 hover:bg-violet-deep disabled:opacity-60"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-[0.9375rem] font-medium text-ink transition-colors duration-200 hover:bg-mist disabled:opacity-60"
             >
               {busy && <Loader2 aria-hidden className="size-4 animate-spin" />}
               {busy ? "Sending…" : "Send message"}
@@ -227,7 +227,7 @@ export default function ContactSection() {
             <p id="contact-status" aria-live="polite" className="text-sm">
               {status === "success" && (
                 <span className="inline-flex items-center gap-2 text-on-night">
-                  <CheckCircle aria-hidden className="size-4 text-violet-glow" />
+                  <CheckCircle aria-hidden className="size-4 text-on-night" />
                   Message sent. I&apos;ll reply by email.
                 </span>
               )}

@@ -24,7 +24,7 @@ export default function AboutSection() {
               height={1152}
               loading="lazy"
               decoding="async"
-              className="mt-10 hidden h-auto w-full max-w-[18.75rem] rounded-[2rem] bg-gradient-to-b from-violet-wash to-paper-2 lg:block"
+              className="mt-10 hidden h-auto w-full max-w-[18.75rem] rounded-[2rem] bg-paper-2 contrast-[1.04] grayscale lg:block"
             />
           </picture>
         </div>

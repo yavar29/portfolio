@@ -2,8 +2,8 @@
 
 function Placeholder({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={`rounded-xl border border-dashed border-violet-glow/40 p-4 ${className ?? ""}`}>
-      <p className="mb-1 text-xs font-semibold text-violet-glow">Placeholder</p>
+    <div className={`rounded-xl border border-dashed border-white/25 p-4 ${className ?? ""}`}>
+      <p className="mb-1 text-xs font-semibold text-on-night-2">Placeholder</p>
       <div className="flex flex-1 flex-col text-on-night-2">{children}</div>
     </div>
   );
@@ -11,7 +11,7 @@ function Placeholder({ children, className }: { children: React.ReactNode; class
 
 export default function AerveilSection() {
   return (
-    <section id="aerveil" className="section-pad bg-night text-on-night">
+    <section id="aerveil" className="on-dark section-pad bg-night text-on-night">
       <div className="container-page">
         <div className="flex flex-col gap-3 border-b border-white/10 pb-8 sm:flex-row sm:items-end sm:justify-between">
           <h2 className="t-h2">Aerveil</h2>

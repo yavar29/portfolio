@@ -1,22 +1,17 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-paper: #fbfafe;
-  --color-paper-2: #f4f1fa;
-  --color-ink: #1c1530;
-  --color-ink-2: #4a4260;
-  --color-ink-3: #6e6785;
-  --color-line: #e4dfee;
-  --color-violet: #6c48c5;
-  --color-violet-deep: #5a3ba6;
-  --color-violet-wash: #eee8fa;
-  --color-night: #17112a;
-  --color-night-deep: #1a1036;
-  --color-night-2: #221a3a;
-  --color-on-night: #f3effb;
-  --color-on-night-2: #b9b0d0;
-  --color-violet-glow: #b49cf0;
-  --color-clay: #d87756;
+  --color-paper: #ffffff;
+  --color-paper-2: #f5f5f5;
+  --color-ink: #0a0a0a;
+  --color-ink-2: #404040;
+  --color-ink-3: #6b6b6b;
+  --color-line: #e5e5e5;
+  --color-mist: #d4d4d4;
+  --color-night: #000000;
+  --color-night-2: #141414;
+  --color-on-night: #fafafa;
+  --color-on-night-2: #a3a3a3;
 
   --font-sans: var(--font-schibsted), ui-sans-serif, system-ui, sans-serif;
   --font-serif: var(--font-newsreader), ui-serif, Georgia, serif;
@@ -56,12 +51,12 @@
   }
 
   ::selection {
-    background: var(--color-violet-wash);
+    background: var(--color-mist);
     color: var(--color-ink);
   }
 
   :focus-visible {
-    outline: 2px solid var(--color-violet);
+    outline: 2px solid var(--color-ink);
     outline-offset: 3px;
     border-radius: 4px;
   }
@@ -88,7 +83,7 @@
   }
 
   .section-pad {
-    padding-block: clamp(5rem, 4rem + 5vw, 9rem);
+    padding-block: clamp(4.5rem, 3.5rem + 4vw, 7.5rem);
   }
 
   .t-display {
@@ -133,25 +128,44 @@
     animation-delay: var(--d, 0ms);
   }
 
-  /* Dark surfaces: the default violet focus ring is too dim on night backgrounds. */
+  /* Dark surfaces: the default black focus ring would vanish on night backgrounds. */
   .on-dark :focus-visible {
-    outline-color: var(--color-violet-glow);
+    outline-color: var(--color-on-night);
   }
 
-  /* Hero credential: a crisp edge in the badge's own terracotta, no glow. */
-  .credential {
-    border: 1px solid rgb(216 119 86 / 0.55);
-    background-color: rgb(255 255 255 / 0.04);
-    transition:
-      transform 0.35s var(--ease-out-quint),
-      border-color 0.35s,
-      background-color 0.35s;
+  /*
+   * The hero name fills the content width. The divisor is the name's width in ems:
+   * "Yavar" alone on small screens (two lines), "Yavar Khan" on one line above that.
+   */
+  .hero {
+    --name-size: calc((100vw - 2.5rem) / 2.7);
   }
 
-  .credential:hover {
-    transform: translateY(-3px);
-    border-color: rgb(216 119 86 / 0.9);
-    background-color: rgb(255 255 255 / 0.07);
+  @media (min-width: 640px) {
+    .hero {
+      --name-size: calc((100vw - 4rem) / 4.55);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .hero {
+      --name-size: calc((min(100vw, 76rem) - 5rem) / 4.55);
+    }
+  }
+
+  .hero-name {
+    font-size: var(--name-size);
+    line-height: 0.82;
+    letter-spacing: -0.04em;
+  }
+
+  /* The hero badge links to Credly; a small lift is its only hover cue. */
+  .badge-link {
+    transition: transform 0.35s var(--ease-out-quint);
+  }
+
+  .badge-link:hover {
+    transform: translateY(-4px);
   }
 
   /* One light pass across the badge, clipped to the badge's own silhouette. */
@@ -242,7 +256,7 @@
     display: none;
   }
 
-  .credential:hover {
+  .badge-link:hover {
     transform: none;
   }
 }

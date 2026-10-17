@@ -197,7 +197,7 @@ export default function JourneySection() {
               <path
                 d={layout.d}
                 fill="none"
-                stroke="#e3dcee"
+                stroke="#e2e2e2"
                 strokeWidth={layout.road.width}
                 strokeLinecap="round"
               />
@@ -205,21 +205,21 @@ export default function JourneySection() {
                 <path
                   d={layout.d}
                   fill="none"
-                  stroke="#4a4163"
+                  stroke="#3d3d3d"
                   strokeWidth={layout.road.width + 3}
                   strokeLinecap="round"
                 />
                 <path
                   d={layout.d}
                   fill="none"
-                  stroke="#2b2440"
+                  stroke="#161616"
                   strokeWidth={layout.road.width}
                   strokeLinecap="round"
                 />
                 <path
                   d={layout.d}
                   fill="none"
-                  stroke="#f4f0fa"
+                  stroke="#fafafa"
                   strokeWidth={layout.road.centerLine}
                   strokeDasharray={layout.road.dash}
                 />
@@ -230,7 +230,7 @@ export default function JourneySection() {
           <span
             ref={headRef}
             aria-hidden
-            className="pointer-events-none absolute left-0 top-0 z-20 -ml-[7px] -mt-[7px] size-3.5 rounded-full bg-violet opacity-0 shadow-[0_0_0_6px_rgba(108,72,197,0.2)]"
+            className="pointer-events-none absolute left-0 top-0 z-20 -ml-[7px] -mt-[7px] size-3.5 rounded-full bg-ink opacity-0 shadow-[0_0_0_6px_rgba(0,0,0,0.14)]"
           />
 
           {milestones.map((m, i) => (
@@ -272,7 +272,7 @@ function MilestoneItem({
         <span
           ref={markerRef}
           data-reached={arrived}
-          className="relative z-10 mt-2 block size-[18px] rounded-full border-[3px] border-[#cbc1de] bg-paper-2 transition-[background-color,border-color,box-shadow] duration-500 data-[reached=true]:border-violet data-[reached=true]:bg-violet data-[reached=true]:shadow-[0_0_0_5px_rgba(108,72,197,0.16)]"
+          className="relative z-10 mt-2 block size-[18px] rounded-full border-[3px] border-mist bg-paper-2 transition-[background-color,border-color,box-shadow] duration-500 data-[reached=true]:border-ink data-[reached=true]:bg-ink data-[reached=true]:shadow-[0_0_0_5px_rgba(0,0,0,0.1)]"
         />
       </div>
 
@@ -307,7 +307,7 @@ function MilestoneItem({
             />
           )}
           <div className="min-w-0">
-            <p className="text-sm font-medium text-violet-deep">{m.period}</p>
+            <p className="text-sm font-medium text-ink-3">{m.period}</p>
             <h3 className="t-h3 mt-1.5 text-ink">{m.title}</h3>
             <p className="mt-1.5 text-ink-2">
               {m.org}
@@ -322,7 +322,7 @@ function MilestoneItem({
           <ul className="mt-4 space-y-1.5 text-[0.9688rem] text-ink-2">
             {m.highlights.map((h) => (
               <li key={h} className="flex gap-3">
-                <span aria-hidden className="mt-[0.7em] h-px w-3 shrink-0 bg-violet" />
+                <span aria-hidden className="mt-[0.7em] h-px w-3 shrink-0 bg-ink" />
                 {h}
               </li>
             ))}
@@ -336,7 +336,7 @@ function MilestoneItem({
                 key={link.href}
                 href={link.href}
                 {...(link.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-                className="link inline-flex items-center gap-1 text-violet-deep"
+                className="link inline-flex items-center gap-1 text-ink"
               >
                 {link.label}
                 {link.external && <ArrowUpRight aria-hidden className="size-3.5" />}
@@ -415,7 +415,7 @@ function Details({ id, details }: { id: string; details: NonNullable<Milestone["
             )}
 
             {details.endorsers?.map((endorser) => (
-              <figure key={endorser.name} className="border-l-2 border-violet/40 pl-4">
+              <figure key={endorser.name} className="border-l-2 border-ink/20 pl-4">
                 {endorser.quotes.map((quote) => (
                   <blockquote key={quote} className="mt-2 font-serif text-[1.0625rem] leading-relaxed text-ink first:mt-0">
                     “{quote}”

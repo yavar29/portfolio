@@ -6,7 +6,7 @@ export default function CertificationsSection() {
   return (
     <section id="certifications" className="section-pad bg-paper-2 pt-0">
       <div className="container-page">
-        <div className="border-t border-ink/15 pt-[clamp(5rem,4rem+5vw,9rem)]">
+        <div className="border-t border-ink/15 pt-[clamp(4.5rem,3.5rem+4vw,7.5rem)]">
           <h2 className="t-h2">Certifications</h2>
           <ul className="mt-14 grid gap-12 sm:grid-cols-2 sm:gap-14 lg:grid-cols-3 lg:gap-10">
             {certifications.map((cert) => (
@@ -31,7 +31,7 @@ export default function CertificationsSection() {
                     href={cert.verifyUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="link mt-3 inline-flex items-center gap-1 text-[0.9375rem] text-violet-deep"
+                    className="link mt-3 inline-flex items-center gap-1 text-[0.9375rem] text-ink"
                   >
                     {cert.verifyLabel}
                     <ArrowUpRight aria-hidden className="size-3.5" />

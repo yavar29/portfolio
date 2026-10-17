@@ -7,7 +7,7 @@ function ExternalLink({ href, children }: { href: string; children: React.ReactN
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="link inline-flex items-center gap-1 text-violet-deep"
+      className="link inline-flex items-center gap-1 text-ink"
     >
       {children}
       <ArrowUpRight aria-hidden className="size-3.5" />
@@ -49,7 +49,7 @@ export default function ProjectsSection() {
                 <ul className="space-y-3 text-ink-2">
                   {project.points.map((point) => (
                     <li key={point} className="flex gap-3">
-                      <span aria-hidden className="mt-[0.8em] h-px w-3 shrink-0 bg-violet" />
+                      <span aria-hidden className="mt-[0.8em] h-px w-3 shrink-0 bg-ink" />
                       {point}
                     </li>
                   ))}
