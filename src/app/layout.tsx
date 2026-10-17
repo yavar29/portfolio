@@ -1,86 +1,70 @@
-import type { Metadata } from "next";
-import { DM_Sans, Space_Grotesk, Playfair_Display, JetBrains_Mono } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Newsreader, Schibsted_Grotesk } from "next/font/google";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import { SITE, SOCIAL_LINKS } from "@/lib/constants";
+import { certifications } from "@/lib/data";
 import "./globals.css";
 
-const dmSans = DM_Sans({
-  variable: "--font-sans",
+const newsreader = Newsreader({
+  variable: "--font-newsreader",
   subsets: ["latin"],
+  weight: "400",
   display: "swap",
 });
 
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-heading",
-  subsets: ["latin"],
-  display: "swap",
-});
-
-const playfair = Playfair_Display({
-  variable: "--font-display",
-  subsets: ["latin"],
-  display: "swap",
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-mono",
+const schibsted = Schibsted_Grotesk({
+  variable: "--font-schibsted",
   subsets: ["latin"],
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Yavar Khan | AI & Software Engineer",
-  description:
-    "Portfolio of Yavar Khan — AI/ML Engineer bridging Software Engineering and Artificial Intelligence to build intelligent, scalable systems. MS CS (AI/ML) from SUNY Buffalo.",
-  keywords: [
-    "Yavar Khan",
-    "AI Engineer",
-    "Software Engineer",
-    "Machine Learning",
-    "GenAI",
-    "LangChain",
-    "RAG",
-    "Portfolio",
-  ],
-  authors: [{ name: "Yavar Khan" }],
+  metadataBase: new URL(SITE.url),
+  title: SITE.title,
+  description: SITE.description,
+  alternates: { canonical: "/" },
+  authors: [{ name: SITE.name, url: SITE.url }],
   openGraph: {
-    title: "Yavar Khan | AI & Software Engineer",
-    description:
-      "Building intelligent systems at the intersection of AI/ML and Software Engineering.",
+    title: SITE.title,
+    description: SITE.description,
+    url: "/",
+    siteName: SITE.name,
     type: "website",
     locale: "en_US",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: SITE.title }],
   },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE.title,
+    description: SITE.description,
+    images: ["/og-image.png"],
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#fbfafe",
 };
 
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "Person",
-  name: "Yavar Khan",
-  jobTitle: "AI & Software Engineer",
-  url: "https://yavarkhan.dev",
-  email: "yavarkhan1997@gmail.com",
-  sameAs: [
-    "https://github.com/yavar29",
-    "https://linkedin.com/in/yavar-khan29",
-  ],
+  name: SITE.name,
+  jobTitle: "AI Engineer",
+  url: SITE.url,
+  email: SITE.email,
+  worksFor: { "@type": "Organization", name: "Aerveil" },
+  address: { "@type": "PostalAddress", addressLocality: "San Jose", addressRegion: "CA", addressCountry: "US" },
+  sameAs: [SOCIAL_LINKS.github, SOCIAL_LINKS.linkedin],
   alumniOf: [
-    {
-      "@type": "CollegeOrUniversity",
-      name: "University at Buffalo, SUNY",
-    },
-    {
-      "@type": "CollegeOrUniversity",
-      name: "Amity University",
-    },
+    { "@type": "CollegeOrUniversity", name: "University at Buffalo, SUNY" },
+    { "@type": "CollegeOrUniversity", name: "Amity University" },
   ],
-  knowsAbout: [
-    "Artificial Intelligence",
-    "Machine Learning",
-    "Generative AI",
-    "Software Engineering",
-    "LangChain",
-    "RAG",
-  ],
+  hasCredential: certifications.map((cert) => ({
+    "@type": "EducationalOccupationalCredential",
+    name: cert.title,
+    recognizedBy: { "@type": "Organization", name: cert.issuer },
+  })),
 };
 
 export default function RootLayout({
@@ -89,21 +73,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="scroll-smooth" suppressHydrationWarning>
-      <head>
+    <html lang="en" className={`${newsreader.variable} ${schibsted.variable}`}>
+      <body>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        <script
-          src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
-          async
-          defer
-        />
-      </head>
-      <body className={`${dmSans.variable} ${spaceGrotesk.variable} ${playfair.variable} ${jetbrainsMono.variable} antialiased`} suppressHydrationWarning>
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-full focus:bg-ink focus:px-4 focus:py-2 focus:text-paper"
+        >
+          Skip to content
+        </a>
         <Navbar />
-        <main>{children}</main>
+        <main id="main">{children}</main>
         <Footer />
       </body>
     </html>

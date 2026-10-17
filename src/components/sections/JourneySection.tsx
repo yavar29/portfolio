@@ -1,808 +1,434 @@
 "use client";
 
-import { useRef, useState, useEffect, useCallback } from "react";
-import SectionWrapper from "@/components/ui/SectionWrapper";
-import AnimateOnScroll from "@/components/ui/AnimateOnScroll";
-import { motion, AnimatePresence } from "framer-motion";
-import { roadmapMilestones, type RoadmapMilestone } from "@/lib/data";
+/* eslint-disable @next/next/no-img-element -- static export ships pre-optimized WebP badges */
+import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import {
-  GraduationCap,
-  Briefcase,
-  BookOpen,
-  Zap,
-  Rocket,
-  Paperclip,
-  ChevronDown,
-} from "lucide-react";
+  useMotionValue,
+  useMotionValueEvent,
+  useReducedMotion,
+  useScroll,
+  useSpring,
+} from "motion/react";
+import { ArrowUpRight, ChevronDown } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { milestones, type Milestone } from "@/lib/data";
 
-const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
-  GraduationCap,
-  Briefcase,
-  BookOpen,
-  Zap,
-  Rocket,
-};
-
-function parseYearRange(year: string) {
-  const m = year.match(/(\d{4})\s*[–-]\s*(\S+)/);
-  return { from: m?.[1] ?? null, to: m?.[2] ?? null };
+interface RoadStyle {
+  width: number;
+  swing: number;
+  dash: string;
+  centerLine: number;
 }
 
-/* ═══════════════════════════════════════════════════════════
-   MILESTONE PANEL — editorial typography, no card borders
-═══════════════════════════════════════════════════════════ */
-function MilestonePanel({
-  ms,
-  side,
-  open,
-  onToggle,
-}: {
-  ms: RoadmapMilestone;
-  side: "left" | "right";
-  open: boolean;
-  onToggle: () => void;
-}) {
-  const isRight = side === "right";
-  const hasDetails = !!(ms.subRoles || ms.courses || ms.coreSubjects || ms.endorsers);
-  const { from: yearFrom, to: yearTo } = parseYearRange(ms.year);
+const ROAD_WIDE: RoadStyle = { width: 22, swing: 34, dash: "8 10", centerLine: 1.6 };
+const ROAD_NARROW: RoadStyle = { width: 12, swing: 5, dash: "5 7", centerLine: 1.1 };
+const SAMPLES = 240;
 
-  /* Ghost year — start year, or "NOW" for active */
-  const ghostYear = yearFrom ?? (ms.isActive ? "NOW" : null);
-
-  return (
-    <motion.div
-      className={`relative w-full max-w-[480px] text-justify ${isRight ? "" : "ml-auto"}`}
-      initial={{ opacity: 0, x: isRight ? 50 : -50 }}
-      whileInView={{ opacity: 1, x: 0 }}
-      viewport={{ once: true, margin: "-40px" }}
-      transition={{ duration: 0.65, ease: "easeOut" }}
-    >
-      {/* Ghost year behind content */}
-      {ghostYear && (
-        <span
-          className={`pointer-events-none select-none absolute -top-4 text-[5.5rem] font-black leading-none tracking-tight ${isRight ? "left-0" : "right-0"}`}
-          style={{ color: ms.color, opacity: 0.07 }}
-        >
-          {ghostYear}
-        </span>
-      )}
-
-      <div className="relative z-10">
-
-        {/* ── Date range — uniform size, no counter ── */}
-        <div className={`flex items-center gap-2 mb-3 ${isRight ? "" : "justify-end"}`}>
-          {yearFrom ? (
-            <span
-              className="text-[13px] font-bold font-mono tracking-wide"
-              style={{ color: ms.color }}
-            >
-              {yearFrom} → {yearTo === "Present" ? "now" : yearTo}
-            </span>
-          ) : (
-            <span
-              className="text-[13px] font-bold font-mono tracking-wide"
-              style={{ color: ms.color }}
-            >
-              Now
-            </span>
-          )}
-          {ms.isActive && (
-            <span className="relative flex h-2.5 w-2.5 shrink-0">
-              <span
-                className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-60"
-                style={{ backgroundColor: ms.color }}
-              />
-              <span
-                className="relative inline-flex h-2.5 w-2.5 rounded-full"
-                style={{ backgroundColor: ms.color }}
-              />
-            </span>
-          )}
-        </div>
-
-        {/* Role title */}
-        <h3 className={`text-[1.45rem] sm:text-[1.6rem] font-black text-brand-dark font-[family-name:var(--font-heading)] leading-[1.15] ${isRight ? "text-left" : "text-right"}`}>
-          {ms.role}
-        </h3>
-
-        {/* GPA */}
-        {ms.gpa && (
-          <span className={`text-sm font-bold block mt-0.5 ${isRight ? "text-left" : "text-right"}`} style={{ color: ms.color }}>
-            GPA {ms.gpa}
-          </span>
-        )}
-
-        {/* Institution */}
-        {ms.label && ms.label.trim() && (
-          <p className={`text-xs font-medium text-gray-500 mt-0.5 tracking-wide ${isRight ? "text-left" : "text-right"}`}>
-            {ms.label}
-          </p>
-        )}
-
-        {/* Expand button — right after title block, very visible */}
-        {hasDetails && (
-          <button
-            onClick={onToggle}
-            className={`mt-3 inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[10.5px] font-semibold transition-all duration-200 hover:opacity-80 active:scale-95 ${!isRight ? "ml-auto block" : ""}`}
-            style={{
-              borderColor: `${ms.color}60`,
-              color: ms.color,
-              backgroundColor: open ? `${ms.color}15` : `${ms.color}08`,
-            }}
-          >
-            <ChevronDown
-              className="h-3 w-3 shrink-0 transition-transform duration-200"
-              style={{ transform: open ? "rotate(180deg)" : "none" }}
-            />
-            {open ? "hide details" : "full details"}
-          </button>
-        )}
-
-        {/* Thin accent rule */}
-        <div
-          className={`mt-4 mb-3.5 h-[2px] w-8 rounded-full ${!isRight ? "ml-auto" : ""}`}
-          style={{
-            background: `linear-gradient(${isRight ? "90deg" : "270deg"}, ${ms.color} 0%, ${ms.color}20 100%)`,
-          }}
-        />
-
-        {/* Story — pull-quote feel with thin side border */}
-        <div
-          className={`text-[15px] leading-[1.9] text-gray-700 ${isRight ? "pl-3 border-l-[1.5px]" : "pr-3 border-r-[1.5px]"}`}
-          style={{ borderColor: `${ms.color}38` }}
-        >
-          {ms.story}
-          {ms.collaborator && (
-            <span className="block mt-2 text-[13px] italic text-gray-500">
-              Co-building with{" "}
-              {ms.collaborator.linkedin ? (
-                <a
-                  href={ms.collaborator.linkedin}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="not-italic font-semibold text-gray-600 hover:text-brand-dark transition-colors underline underline-offset-2 decoration-gray-300"
-                >
-                  {ms.collaborator.name}
-                </a>
-              ) : (
-                <span className="not-italic font-semibold text-gray-600">
-                  {ms.collaborator.name}
-                </span>
-              )}
-            </span>
-          )}
-        </div>
-
-        {/* Metrics — distinct pill badges */}
-        {ms.metrics && ms.metrics.length > 0 && (
-          <div className={`mt-4 flex flex-wrap gap-2 ${!isRight ? "justify-end" : ""}`}>
-            {ms.metrics.map((m) => (
-              <span
-                key={m}
-                className="text-[12px] font-bold px-3 py-1 rounded-full"
-                style={{
-                  color: ms.color,
-                  backgroundColor: `${ms.color}12`,
-                  border: `1px solid ${ms.color}30`,
-                }}
-              >
-                {m}
-              </span>
-            ))}
-          </div>
-        )}
-
-        {/* Stack */}
-        <div className={`mt-3.5 ${!isRight ? "flex flex-col items-end" : ""}`}>
-          <span className="text-[8px] font-bold uppercase tracking-[0.28em] text-gray-400 mb-1.5 block">
-            Stack
-          </span>
-          <div className={`flex flex-wrap gap-1.5 ${!isRight ? "justify-end" : ""}`}>
-            {ms.tech.slice(0, 5).map((t) => (
-              <span
-                key={t}
-                className="text-[11.5px] font-medium text-gray-500 border border-gray-300/60 bg-white/30 px-2.5 py-0.5 rounded"
-              >
-                {t}
-              </span>
-            ))}
-            {ms.tech.length > 5 && (
-              <span className="text-[10px] text-gray-400 self-center">
-                +{ms.tech.length - 5}
-              </span>
-            )}
-          </div>
-        </div>
-
-        {/* Official Documents */}
-        {(ms.transcriptPdf || ms.degreePdf) && (
-          <div className={`mt-2.5 flex gap-4 ${!isRight ? "justify-end" : ""}`}>
-            {ms.transcriptPdf && (
-              <a
-                href={ms.transcriptPdf}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-[11px] font-semibold transition-opacity hover:opacity-60"
-                style={{ color: ms.color }}
-              >
-                <Paperclip className="h-3 w-3" />
-                Official Transcript
-              </a>
-            )}
-            {ms.degreePdf && (
-              <a
-                href={ms.degreePdf}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-[11px] font-semibold transition-opacity hover:opacity-60"
-                style={{ color: ms.color }}
-              >
-                <Paperclip className="h-3 w-3" />
-                Degree Certificate
-              </a>
-            )}
-          </div>
-        )}
-
-        {/* Expanded details */}
-        <AnimatePresence>
-          {open && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.32, ease: "easeInOut" }}
-              className="overflow-hidden"
-            >
-              <div className="mt-5 space-y-6">
-
-                {ms.coreSubjects && (
-                  <div>
-                    <p className={`text-[11px] font-bold uppercase tracking-[0.2em] text-gray-500 mb-2.5 ${!isRight ? "text-right" : ""}`}>
-                      Core Subjects
-                    </p>
-                    <div className={`flex flex-wrap gap-2 ${!isRight ? "justify-end" : ""}`}>
-                      {ms.coreSubjects.map((s) => (
-                        <span
-                          key={s}
-                          className="text-[12px] font-medium text-gray-600 bg-white/60 border border-gray-200/80 px-2.5 py-1 rounded-md"
-                        >
-                          {s}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {ms.courses && (
-                  <div>
-                    <p className={`text-[11px] font-bold uppercase tracking-[0.2em] text-gray-500 mb-2.5 ${!isRight ? "text-right" : ""}`}>
-                      Coursework
-                    </p>
-                    <div className="space-y-2">
-                      {ms.courses.map((c) => (
-                        <div
-                          key={c.name}
-                          className={`flex items-baseline gap-3 ${!isRight ? "flex-row-reverse" : "justify-between"}`}
-                        >
-                          <span className="text-[13px] text-gray-700 leading-snug font-medium">
-                            {c.name}
-                          </span>
-                          <span
-                            className="text-[13px] font-bold shrink-0 tabular-nums"
-                            style={{ color: ms.color }}
-                          >
-                            {c.grade}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {ms.subRoles && (
-                  <div>
-                    <p className={`text-[11px] font-bold uppercase tracking-[0.2em] text-gray-500 mb-2.5 ${!isRight ? "text-right" : ""}`}>
-                      Career Progression
-                    </p>
-                    <div className="space-y-5">
-                      {ms.subRoles.map((sub) => (
-                        <div
-                          key={sub.title}
-                          className={`relative py-1 ${isRight ? "pl-3.5 border-l-2" : "pr-3.5 border-r-2 text-right"}`}
-                          style={{ borderColor: `${ms.color}45` }}
-                        >
-                          <p className="text-[13.5px] font-bold text-brand-dark">
-                            {sub.title}
-                          </p>
-                          <p className="text-[12px] text-gray-500 font-medium mb-2">{sub.period}</p>
-                          <ul className="space-y-1.5">
-                            {sub.description.map((point) => (
-                              <li
-                                key={point}
-                                className={`flex items-start gap-2 text-[13px] leading-relaxed text-gray-600 ${!isRight ? "flex-row-reverse text-justify" : "text-justify"}`}
-                              >
-                                <span
-                                  className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full"
-                                  style={{ backgroundColor: ms.color }}
-                                />
-                                {point}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {ms.endorsers && (
-                  <div>
-                    <p className={`text-[11px] font-bold uppercase tracking-[0.2em] text-gray-500 mb-2.5 ${!isRight ? "text-right" : ""}`}>
-                      Endorsements
-                    </p>
-                    <div className="space-y-5">
-                      {ms.endorsers.map((endorser) => (
-                        <div key={endorser.name}>
-                          <p className="text-[13.5px] font-bold text-brand-dark">
-                            {endorser.name}
-                          </p>
-                          <p className="text-[12px] text-gray-500 font-medium mb-2">{endorser.title}</p>
-                          <div className="space-y-2">
-                            {endorser.endorsements.map((e) => (
-                              <p
-                                key={e.quote}
-                                className={`text-[13px] italic leading-relaxed text-gray-600 ${isRight ? "pl-3 border-l-2" : "pr-3 border-r-2"}`}
-                                style={{ borderColor: `${ms.color}30` }}
-                              >
-                                &ldquo;{e.quote}&rdquo;
-                              </p>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-    </motion.div>
-  );
+interface Point {
+  x: number;
+  y: number;
 }
 
-/* ═══════════════════════════════════════════════════════════
-   MAIN SECTION
-═══════════════════════════════════════════════════════════ */
+interface Layout {
+  width: number;
+  height: number;
+  d: string;
+  road: RoadStyle;
+  markers: Point[];
+}
+
+interface Measured {
+  length: number;
+  height: number;
+  ys: Float32Array;
+  markerFractions: number[];
+}
+
+// A serpentine road through every milestone marker: each leg bows to alternating sides,
+// so the curve crosses the markers diagonally and stays smooth.
+function buildRoad(markers: Point[], swing: number) {
+  const first = markers[0];
+  let d = `M ${first.x} ${first.y - 40} L ${first.x} ${first.y}`;
+  for (let i = 1; i < markers.length; i++) {
+    const a = markers[i - 1];
+    const b = markers[i];
+    const dy = b.y - a.y;
+    const side = i % 2 === 1 ? 1 : -1;
+    d += ` C ${a.x + side * swing} ${a.y + dy * 0.3}, ${b.x + side * swing} ${a.y + dy * 0.7}, ${b.x} ${b.y}`;
+  }
+  const last = markers[markers.length - 1];
+  return `${d} L ${last.x} ${last.y + 28}`;
+}
+
+function fractionAtY(m: Measured, y: number) {
+  const { ys } = m;
+  if (y <= ys[0]) return 0;
+  if (y >= ys[SAMPLES]) return 1;
+  let lo = 0;
+  let hi = SAMPLES;
+  while (hi - lo > 1) {
+    const mid = (lo + hi) >> 1;
+    if (ys[mid] < y) lo = mid;
+    else hi = mid;
+  }
+  const t = (y - ys[lo]) / (ys[hi] - ys[lo] || 1);
+  return (lo + t) / SAMPLES;
+}
+
 export default function JourneySection() {
-  /* milestones reversed = most recent (WeatherWise) first */
-  const milestones = [...roadmapMilestones].reverse();
-  const containerRef = useRef<HTMLDivElement>(null);
-  const nodeRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const [road, setRoad] = useState({ d: "", w: 0, h: 0 });
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const total = milestones.length;
+  const listRef = useRef<HTMLOListElement>(null);
+  const maskPathRef = useRef<SVGPathElement>(null);
+  const headRef = useRef<HTMLSpanElement>(null);
+  const markerRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const measuredRef = useRef<Measured | null>(null);
+  const arrivedRef = useRef(-1);
+  const [layout, setLayout] = useState<Layout | null>(null);
+  // -1 means "not tracking": every milestone is shown (before hydration, and for reduced motion).
+  const [arrived, setArrived] = useState(-1);
+  const reduceMotion = useReducedMotion();
+  const maskId = useId();
 
-  const toggleMilestone = useCallback((i: number) => {
-    setOpenIndex((prev) => (prev === i ? null : i));
-  }, []);
-
-  /* Build the bezier S-curve path through measured node centers */
-  const measureRoad = useCallback(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    const cRect = el.getBoundingClientRect();
-    const pts = nodeRefs.current
-      .map((ref) => {
-        if (!ref) return null;
-        const r = ref.getBoundingClientRect();
-        return {
-          x: r.left + r.width / 2 - cRect.left,
-          y: r.top + r.height / 2 - cRect.top,
-        };
-      })
-      .filter(Boolean) as { x: number; y: number }[];
-    if (pts.length < 2) return;
-
-    /* Entry straight from top */
-    let d = `M ${pts[0].x} ${Math.max(0, pts[0].y - 100)} L ${pts[0].x} ${pts[0].y}`;
-
-    /* Cubic bezier between each pair — pull control points toward the
-       far side to create a more dramatic, diagonal-feeling swing */
-    for (let i = 0; i < pts.length - 1; i++) {
-      const a = pts[i];
-      const b = pts[i + 1];
-      const dy = b.y - a.y;
-      /* Control points biased toward the destination x, creating an asymmetric
-         "lean-in" curve that feels more like a real winding road */
-      const cp1x = a.x + (b.x - a.x) * 0.15;
-      const cp1y = a.y + dy * 0.55;
-      const cp2x = b.x - (b.x - a.x) * 0.15;
-      const cp2y = b.y - dy * 0.55;
-      d += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${b.x} ${b.y}`;
-    }
-
-    /* Exit straight at bottom */
-    const last = pts[pts.length - 1];
-    d += ` L ${last.x} ${last.y + 100}`;
-    setRoad({ d, w: cRect.width, h: cRect.height });
-  }, []);
+  const { scrollYProgress } = useScroll({ target: listRef, offset: ["start 65%", "end 65%"] });
+  const target = useMotionValue(0);
+  const drawn = useSpring(target, { stiffness: 140, damping: 32, restDelta: 0.0005 });
 
   useEffect(() => {
-    const timer = setTimeout(measureRoad, 80);
-    const observer = new ResizeObserver(() => requestAnimationFrame(measureRoad));
-    if (containerRef.current) observer.observe(containerRef.current);
-    return () => {
-      clearTimeout(timer);
-      observer.disconnect();
+    const list = listRef.current;
+    if (!list) return;
+    const measure = () => {
+      const box = list.getBoundingClientRect();
+      const markers = markerRefs.current.map((el) => {
+        const r = el!.getBoundingClientRect();
+        return { x: r.left - box.left + r.width / 2, y: r.top - box.top + r.height / 2 };
+      });
+      const road = window.matchMedia("(min-width: 768px)").matches ? ROAD_WIDE : ROAD_NARROW;
+      setLayout({ width: box.width, height: box.height, d: buildRoad(markers, road.swing), road, markers });
     };
-  }, [measureRoad]);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(list);
+    return () => observer.disconnect();
+  }, []);
 
-  /* Re-measure road when a milestone expands/collapses */
-  useEffect(() => {
-    const timer = setTimeout(measureRoad, 350);
-    return () => clearTimeout(timer);
-  }, [openIndex, measureRoad]);
+  const paint = useCallback((progress: number) => {
+    const m = measuredRef.current;
+    const path = maskPathRef.current;
+    if (!m || !path) return;
+    path.style.strokeDashoffset = String(m.length * (1 - progress));
+    const head = headRef.current;
+    if (head) {
+      const p = path.getPointAtLength(m.length * progress);
+      head.style.transform = `translate(${p.x}px, ${p.y}px)`;
+      head.style.opacity = progress > 0.002 && progress < 0.995 ? "1" : "0";
+    }
+    let count = 0;
+    for (let i = 0; i < m.markerFractions.length; i++) {
+      if (progress >= m.markerFractions[i] - 0.004) count = i + 1;
+    }
+    if (count !== arrivedRef.current) {
+      arrivedRef.current = count;
+      setArrived(count);
+    }
+  }, []);
 
-  const earliestYear =
-    roadmapMilestones[0].year.match(/\d{4}/)?.[0] ?? "";
+  useLayoutEffect(() => {
+    const path = maskPathRef.current;
+    if (!layout || !path) return;
+    const length = path.getTotalLength();
+    const ys = new Float32Array(SAMPLES + 1);
+    for (let i = 0; i <= SAMPLES; i++) ys[i] = path.getPointAtLength((length * i) / SAMPLES).y;
+    const measured: Measured = { length, height: layout.height, ys, markerFractions: [] };
+    measured.markerFractions = layout.markers.map((p) => fractionAtY(measured, p.y));
+    measuredRef.current = measured;
+    path.style.strokeDasharray = `${length} ${length}`;
+
+    if (reduceMotion) {
+      path.style.strokeDashoffset = "0";
+      if (headRef.current) headRef.current.style.opacity = "0";
+      return;
+    }
+    path.style.strokeDashoffset = String(length * (1 - drawn.get()));
+    target.set(fractionAtY(measured, scrollYProgress.get() * measured.height));
+    const frame = requestAnimationFrame(() => paint(drawn.get()));
+    return () => cancelAnimationFrame(frame);
+  }, [layout, reduceMotion, target, drawn, scrollYProgress, paint]);
+
+  useMotionValueEvent(scrollYProgress, "change", (p) => {
+    const m = measuredRef.current;
+    if (!m || reduceMotion) return;
+    target.set(fractionAtY(m, p * m.height));
+  });
+
+  useMotionValueEvent(drawn, "change", (v) => {
+    if (!reduceMotion) paint(v);
+  });
 
   return (
-    <SectionWrapper
-      id="journey"
-      className="relative border-b-2 border-black overflow-hidden"
-    >
-      {/* ══════════════════════════════════════════════════════
-          MULTI-ERA GRADIENT BACKGROUND
-          Top (most recent — WeatherWise) → warm red/orange
-          Scrolling down through time → cooler violet/lavender
-      ══════════════════════════════════════════════════════ */}
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "linear-gradient(to bottom, #fde8e8 0%, #fff3e0 18%, #f0fdf9 38%, #f0f9ff 60%, #f3f0ff 80%, #ede9fe 100%)",
-        }}
-      />
-
-      {/* Fine dot grid over the gradient */}
-      <div
-        className="pointer-events-none absolute inset-0 opacity-[0.028]"
-        style={{
-          backgroundImage: "radial-gradient(circle, #000 1px, transparent 1px)",
-          backgroundSize: "30px 30px",
-        }}
-      />
-
-      {/* ── Era atmospheric blobs at their vertical zones ── */}
-      {/* WeatherWise zone (top ~0-20%) */}
-      <div className="pointer-events-none absolute top-[1%] right-[6%] h-[22rem] w-[22rem] rounded-full bg-orange-300/20 blur-3xl animate-mesh-drift-1" />
-      <div className="pointer-events-none absolute top-[6%] left-[4%] h-64 w-64 rounded-full bg-rose-200/22 blur-3xl animate-mesh-drift-2" />
-      {/* GenAI pivot zone (20-38%) */}
-      <div className="pointer-events-none absolute top-[22%] right-[4%] h-72 w-72 rounded-full bg-amber-300/18 blur-3xl animate-mesh-drift-3" />
-      <div className="pointer-events-none absolute top-[28%] left-[8%] h-56 w-56 rounded-full bg-yellow-200/15 blur-3xl animate-mesh-drift-1" />
-      {/* Masters zone (38-60%) */}
-      <div className="pointer-events-none absolute top-[42%] left-[5%] h-72 w-72 rounded-full bg-emerald-200/20 blur-3xl animate-mesh-drift-2" />
-      <div className="pointer-events-none absolute top-[50%] right-[7%] h-56 w-56 rounded-full bg-teal-200/15 blur-3xl animate-mesh-drift-3" />
-      {/* Accenture zone (60-80%) */}
-      <div className="pointer-events-none absolute top-[63%] right-[5%] h-72 w-72 rounded-full bg-sky-200/20 blur-3xl animate-mesh-drift-1" />
-      <div className="pointer-events-none absolute top-[70%] left-[6%] h-56 w-56 rounded-full bg-cyan-200/15 blur-3xl animate-mesh-drift-2" />
-      {/* Bachelors zone (80-100%) */}
-      <div className="pointer-events-none absolute bottom-[5%] left-[4%] h-72 w-72 rounded-full bg-violet-200/22 blur-3xl animate-mesh-drift-3" />
-      <div className="pointer-events-none absolute bottom-[8%] right-[6%] h-56 w-56 rounded-full bg-purple-200/18 blur-3xl animate-mesh-drift-1" />
-
-      {/* ── Section heading ── */}
-      <AnimateOnScroll>
-        <div className="relative z-10 mb-20 text-center">
-          <p className="text-[10px] font-bold uppercase tracking-[0.35em] text-amber-700/50 mb-5 font-mono">
-            ← Career Roadmap →
-          </p>
-          <h2 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold text-brand-dark font-[family-name:var(--font-heading)] leading-[1.05] tracking-tight">
-            My Journey
-          </h2>
-          <p className="mx-auto mt-4 text-lg text-gray-500 font-medium">
-            From Engineering to Intelligence
-          </p>
-          <p className="mt-2 text-[11px] font-medium text-gray-400 tracking-widest uppercase font-mono">
-            {total} milestones · {earliestYear} → present
+    <section id="journey" className="section-pad overflow-hidden bg-paper-2">
+      <div className="container-page">
+        <div className="max-w-[44rem]">
+          <h2 className="t-h2">Journey</h2>
+          <p className="t-lead mt-5 text-ink-2">
+            From an IT degree in India to production API engineering at Accenture, graduate study in
+            AI/ML in Buffalo, and applied AI at Aerveil.
           </p>
         </div>
-      </AnimateOnScroll>
 
-      {/* ══════════════════════════════════════════════════════
-          DESKTOP — 240px center column, wider panels
-      ══════════════════════════════════════════════════════ */}
-      <div className="hidden md:block">
-        <div ref={containerRef} className="relative mx-auto max-w-[1320px]">
-
-          {/* Multi-layer realistic road SVG */}
-          {road.d && (
+        <ol ref={listRef} className="relative mt-16 md:mt-24">
+          {layout && (
             <svg
-              viewBox={`0 0 ${road.w} ${road.h}`}
-              className="absolute inset-0 z-0 h-full w-full pointer-events-none"
-              fill="none"
-              style={{ opacity: road.d ? 1 : 0, transition: "opacity 0.8s" }}
+              aria-hidden
+              width={layout.width}
+              height={layout.height}
+              className="pointer-events-none absolute left-0 top-0 overflow-visible"
             >
-              {/* 1 — long shadow beneath road */}
+              <defs>
+                <mask id={maskId} maskUnits="userSpaceOnUse">
+                  <path
+                    ref={maskPathRef}
+                    d={layout.d}
+                    fill="none"
+                    stroke="#fff"
+                    strokeWidth={layout.road.width + 10}
+                    strokeLinecap="round"
+                  />
+                </mask>
+              </defs>
               <path
-                d={road.d}
-                stroke="rgba(0,0,0,0.10)"
-                strokeWidth="60"
+                d={layout.d}
+                fill="none"
+                stroke="#e3dcee"
+                strokeWidth={layout.road.width}
                 strokeLinecap="round"
               />
-              {/* 2 — sandy gravel shoulder */}
-              <path
-                d={road.d}
-                stroke="#c8b79a"
-                strokeWidth="46"
-                strokeLinecap="round"
-              />
-              {/* 3 — dark tarmac surface */}
-              <path
-                d={road.d}
-                stroke="#272420"
-                strokeWidth="32"
-                strokeLinecap="round"
-              />
-              {/* 4 — subtle asphalt sheen */}
-              <path
-                d={road.d}
-                stroke="rgba(255,255,255,0.032)"
-                strokeWidth="28"
-                strokeLinecap="round"
-              />
-              {/* 5 — white edge-reflector dashes */}
-              <path
-                d={road.d}
-                stroke="rgba(255,255,255,0.22)"
-                strokeWidth="30"
-                strokeDasharray="1 38"
-                strokeLinecap="butt"
-              />
-              {/* 6 — animated amber centre-line dashes */}
-              <path
-                d={road.d}
-                stroke="#fbbf24"
-                strokeWidth="2.5"
-                strokeDasharray="14 10"
-                strokeLinecap="round"
-                className="roadmap-dashes"
-              />
+              <g mask={`url(#${maskId})`}>
+                <path
+                  d={layout.d}
+                  fill="none"
+                  stroke="#4a4163"
+                  strokeWidth={layout.road.width + 3}
+                  strokeLinecap="round"
+                />
+                <path
+                  d={layout.d}
+                  fill="none"
+                  stroke="#2b2440"
+                  strokeWidth={layout.road.width}
+                  strokeLinecap="round"
+                />
+                <path
+                  d={layout.d}
+                  fill="none"
+                  stroke="#f4f0fa"
+                  strokeWidth={layout.road.centerLine}
+                  strokeDasharray={layout.road.dash}
+                />
+              </g>
             </svg>
           )}
 
-          {/* Milestone rows — 240px center column, wider content panels */}
-          <div className="relative z-10 space-y-20">
-            {milestones.map((ms, i) => {
-              const isLeft = i % 2 === 0;
-              const Icon = iconMap[ms.icon] || Zap;
-              const hasDetails = !!(ms.subRoles || ms.courses || ms.coreSubjects || ms.endorsers);
-
-              return (
-                <div
-                  key={ms.id}
-                  className="relative grid items-start"
-                  style={{ gridTemplateColumns: "1fr 240px 1fr" }}
-                >
-                  {/* Subtle local atmosphere glow per milestone */}
-                  <div
-                    className="pointer-events-none absolute h-48 w-48 rounded-full blur-3xl opacity-50"
-                    style={{
-                      backgroundColor: `${ms.color}20`,
-                      top: -20,
-                      ...(isLeft ? { left: 0 } : { right: 0 }),
-                    }}
-                  />
-
-                  {/* Left content */}
-                  <div className={isLeft ? "flex justify-end pr-6 pt-2" : ""}>
-                    {isLeft && (
-                      <MilestonePanel ms={ms} side="left" open={openIndex === i} onToggle={() => toggleMilestone(i)} />
-                    )}
-                  </div>
-
-                  {/* Center: road node — clickable to expand/collapse */}
-                  <div
-                    className="flex pt-2"
-                    style={{ justifyContent: isLeft ? "flex-start" : "flex-end" }}
-                  >
-                    <div
-                      ref={(el) => { nodeRefs.current[i] = el; }}
-                      onClick={hasDetails ? () => toggleMilestone(i) : undefined}
-                      className={`relative z-10 flex h-16 w-16 items-center justify-center rounded-full border-[3px] border-white transition-all duration-300 hover:scale-110 ${hasDetails ? "cursor-pointer" : "cursor-default"}`}
-                      style={{
-                        backgroundColor: ms.color,
-                        boxShadow: openIndex === i
-                          ? `0 0 0 6px ${ms.color}40, 0 0 0 13px ${ms.color}18, 0 8px 28px ${ms.color}70, 0 2px 8px rgba(0,0,0,0.25)`
-                          : `0 0 0 6px ${ms.color}28, 0 0 0 13px ${ms.color}0e, 0 8px 24px ${ms.color}60, 0 2px 8px rgba(0,0,0,0.25)`,
-                      }}
-                      title={hasDetails ? (openIndex === i ? "Click to collapse" : "Click to expand") : undefined}
-                    >
-                      <Icon className="h-7 w-7 text-white" />
-                      {ms.isActive && (
-                        <span
-                          className="absolute inset-0 rounded-full animate-ping opacity-22"
-                          style={{ backgroundColor: ms.color }}
-                        />
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Right content */}
-                  <div className={!isLeft ? "pl-6 pt-2" : ""}>
-                    {!isLeft && (
-                      <MilestonePanel ms={ms} side="right" open={openIndex === i} onToggle={() => toggleMilestone(i)} />
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-        </div>
-      </div>
-
-      {/* ══════════════════════════════════════════════════════
-          MOBILE — vertical tarmac strip on left, editorial content
-      ══════════════════════════════════════════════════════ */}
-      <div className="md:hidden">
-        <div className="relative ml-6">
-          {/* Tarmac strip */}
-          <div
-            className="absolute left-0 top-0 h-full w-[10px] rounded-full"
-            style={{
-              background:
-                "linear-gradient(to bottom, #c8b79a, #272420 8%, #272420 92%, #c8b79a)",
-            }}
+          <span
+            ref={headRef}
+            aria-hidden
+            className="pointer-events-none absolute left-0 top-0 z-20 -ml-[7px] -mt-[7px] size-3.5 rounded-full bg-violet opacity-0 shadow-[0_0_0_6px_rgba(108,72,197,0.2)]"
           />
-          {/* Animated yellow dashes */}
-          <div className="absolute left-[3.5px] top-0 h-full w-[3px] overflow-hidden opacity-70">
-            <div
-              className="roadmap-dashes h-[200%]"
-              style={{
-                backgroundImage:
-                  "repeating-linear-gradient(to bottom, #fbbf24 0px, #fbbf24 12px, transparent 12px, transparent 22px)",
+
+          {milestones.map((m, i) => (
+            <MilestoneItem
+              key={m.id}
+              milestone={m}
+              side={i % 2 === 0 ? "left" : "right"}
+              showYear={i === 0 || milestones[i - 1].year !== m.year}
+              arrived={!!reduceMotion || arrived < 0 || i < arrived}
+              markerRef={(el) => {
+                markerRefs.current[i] = el;
               }}
             />
+          ))}
+        </ol>
+      </div>
+    </section>
+  );
+}
+
+function MilestoneItem({
+  milestone: m,
+  side,
+  showYear,
+  arrived,
+  markerRef,
+}: {
+  milestone: Milestone;
+  side: "left" | "right";
+  showYear: boolean;
+  arrived: boolean;
+  markerRef: (el: HTMLSpanElement | null) => void;
+}) {
+  const left = side === "left";
+
+  return (
+    <li className="relative grid grid-cols-[2.25rem_1fr] gap-x-4 pb-16 last:pb-0 md:grid-cols-[1fr_8rem_1fr] md:gap-x-0 md:pb-24">
+      <div className="col-start-1 row-start-1 flex justify-center md:col-start-2">
+        <span
+          ref={markerRef}
+          data-reached={arrived}
+          className="relative z-10 mt-2 block size-[18px] rounded-full border-[3px] border-[#cbc1de] bg-paper-2 transition-[background-color,border-color,box-shadow] duration-500 data-[reached=true]:border-violet data-[reached=true]:bg-violet data-[reached=true]:shadow-[0_0_0_5px_rgba(108,72,197,0.16)]"
+        />
+      </div>
+
+      {showYear && (
+        <div
+          aria-hidden
+          data-year={m.year}
+          className={cn(
+            "row-start-1 hidden font-serif text-[5rem] leading-[0.8] text-ink/[0.09] before:content-[attr(data-year)] md:block",
+            left ? "md:col-start-3 md:pl-10" : "md:col-start-1 md:pr-10 md:text-right"
+          )}
+        />
+      )}
+
+      <div
+        data-arrived={arrived}
+        className={cn(
+          "col-start-2 row-start-1 min-w-0 transition-[opacity,transform] duration-700 ease-out-quint data-[arrived=false]:translate-y-4 data-[arrived=false]:opacity-0",
+          left ? "md:col-start-1 md:max-w-[31rem] md:justify-self-end md:pr-10" : "md:col-start-3 md:max-w-[31rem] md:pl-10"
+        )}
+      >
+        <div className={cn(m.badge && "flex items-start gap-4")}>
+          {m.badge && (
+            <img
+              src={m.badge}
+              alt=""
+              width={72}
+              height={72}
+              loading="lazy"
+              decoding="async"
+              className="size-[72px] shrink-0"
+            />
+          )}
+          <div className="min-w-0">
+            <p className="text-sm font-medium text-violet-deep">{m.period}</p>
+            <h3 className="t-h3 mt-1.5 text-ink">{m.title}</h3>
+            <p className="mt-1.5 text-ink-2">
+              {m.org}
+              {m.place && <span className="text-ink-3">, {m.place}</span>}
+            </p>
           </div>
+        </div>
 
-          <div className="space-y-10">
-            {milestones.map((ms, i) => {
-              const Icon = iconMap[ms.icon] || Zap;
-              const { from: yearFrom, to: yearTo } = parseYearRange(ms.year);
-              const ghostYear = yearFrom ?? (ms.isActive ? "NOW" : null);
+        {m.summary && <p className="mt-4 text-ink-2">{m.summary}</p>}
 
-              return (
-                <div key={ms.id} className="relative pl-10">
-                  {/* Node icon */}
-                  <div
-                    className="absolute -left-[11px] top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full border-[2.5px] border-white"
-                    style={{
-                      backgroundColor: ms.color,
-                      boxShadow: `0 0 0 4px ${ms.color}22, 0 4px 12px ${ms.color}45`,
-                    }}
-                  >
-                    <Icon className="h-4 w-4 text-white" />
-                  </div>
+        {m.highlights && (
+          <ul className="mt-4 space-y-1.5 text-[0.9688rem] text-ink-2">
+            {m.highlights.map((h) => (
+              <li key={h} className="flex gap-3">
+                <span aria-hidden className="mt-[0.7em] h-px w-3 shrink-0 bg-violet" />
+                {h}
+              </li>
+            ))}
+          </ul>
+        )}
 
-                  <motion.div
-                    initial={{ opacity: 0, x: 20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.55, ease: "easeOut", delay: i * 0.06 }}
-                    className="relative pt-1"
-                  >
-                    {/* Ghost year */}
-                    {ghostYear && (
-                      <span
-                        className="pointer-events-none select-none absolute -top-3 left-0 text-[4rem] font-black leading-none"
-                        style={{ color: ms.color, opacity: 0.07 }}
-                      >
-                        {ghostYear}
-                      </span>
-                    )}
+        {m.links && (
+          <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-[0.9375rem]">
+            {m.links.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                {...(link.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                className="link inline-flex items-center gap-1 text-violet-deep"
+              >
+                {link.label}
+                {link.external && <ArrowUpRight aria-hidden className="size-3.5" />}
+              </a>
+            ))}
+          </div>
+        )}
 
-                    <div className="relative z-10 text-justify">
-                      {/* Date — uniform size, no counter */}
-                      <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        <span
-                          className="text-[13px] font-bold font-mono tracking-wide"
-                          style={{ color: ms.color }}
-                        >
-                          {yearFrom
-                            ? `${yearFrom} → ${yearTo === "Present" ? "now" : yearTo}`
-                            : "Now"}
-                        </span>
-                        {ms.isActive && (
-                          <span className="relative flex h-2 w-2 shrink-0">
-                            <span
-                              className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-70"
-                              style={{ backgroundColor: ms.color }}
-                            />
-                            <span
-                              className="relative inline-flex h-2 w-2 rounded-full"
-                              style={{ backgroundColor: ms.color }}
-                            />
-                          </span>
-                        )}
-                      </div>
+        {m.details && <Details id={m.id} details={m.details} />}
+      </div>
+    </li>
+  );
+}
 
-                      <h3 className="text-lg font-black text-brand-dark font-[family-name:var(--font-heading)] leading-tight text-left">
-                        {ms.role}
-                      </h3>
-                      {ms.gpa && (
-                        <span className="text-xs font-bold" style={{ color: ms.color }}>
-                          GPA {ms.gpa}
-                        </span>
-                      )}
-                      {ms.label && ms.label.trim() && (
-                        <p className="text-xs text-gray-500 mt-0.5">{ms.label}</p>
-                      )}
+function Details({ id, details }: { id: string; details: NonNullable<Milestone["details"]> }) {
+  const [open, setOpen] = useState(false);
+  const panelId = `${id}-details`;
 
-                      <div
-                        className="mt-2.5 mb-2.5 h-[2px] w-7 rounded-full"
-                        style={{
-                          background: `linear-gradient(90deg, ${ms.color}, ${ms.color}20)`,
-                        }}
-                      />
+  return (
+    <div className="mt-5">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        aria-controls={panelId}
+        className="inline-flex items-center gap-1.5 text-sm font-medium text-ink"
+      >
+        {open ? "Hide details" : "Show details"}
+        <ChevronDown
+          aria-hidden
+          className={cn("size-4 transition-transform duration-300", open && "rotate-180")}
+        />
+      </button>
 
-                      <div
-                        className="text-[13px] leading-[1.85] text-gray-700 pl-2.5 border-l-[1.5px]"
-                        style={{ borderColor: `${ms.color}38` }}
-                      >
-                        {ms.story}
-                      </div>
+      <div id={panelId} className="disclosure" data-open={open} inert={!open}>
+        <div>
+          <div className="space-y-6 pt-5 text-[0.9375rem] text-ink-2">
+            {details.subRoles?.map((role) => (
+              <div key={role.title}>
+                <p className="font-semibold text-ink">{role.title}</p>
+                <p className="text-sm text-ink-3">{role.period}</p>
+                <ul className="mt-2 list-disc space-y-1 pl-5 marker:text-ink-3">
+                  {role.points.map((point) => (
+                    <li key={point}>{point}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
 
-                      {/* Metrics — distinct pill badges */}
-                      {ms.metrics && (
-                        <div className="mt-3 flex flex-wrap gap-1.5">
-                          {ms.metrics.map((m) => (
-                            <span
-                              key={m}
-                              className="text-[11px] font-bold px-2.5 py-0.5 rounded-full"
-                              style={{
-                                color: ms.color,
-                                backgroundColor: `${ms.color}12`,
-                                border: `1px solid ${ms.color}30`,
-                              }}
-                            >
-                              {m}
-                            </span>
-                          ))}
-                        </div>
-                      )}
+            {details.courses && (
+              <div>
+                <p className="font-semibold text-ink">Graduate coursework</p>
+                <ul className="mt-2 divide-y divide-line border-y border-line">
+                  {details.courses.map((course) => (
+                    <li key={course.name} className="flex justify-between gap-4 py-1.5">
+                      <span>{course.name}</span>
+                      <span className="tabular-nums text-ink-3">{course.grade}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
-                      <div className="mt-2.5">
-                        <span className="text-[8px] font-bold uppercase tracking-[0.25em] text-gray-400 mb-1 block">
-                          Stack
-                        </span>
-                        <div className="flex flex-wrap gap-1.5">
-                          {ms.tech.slice(0, 4).map((t) => (
-                            <span
-                              key={t}
-                              className="text-[10px] text-gray-400 bg-white/30 border border-gray-200/60 px-1.5 py-0.5 rounded"
-                            >
-                              {t}
-                            </span>
-                          ))}
-                          {ms.tech.length > 4 && (
-                            <span className="text-[10px] text-gray-400">
-                              +{ms.tech.length - 4}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                </div>
-              );
-            })}
+            {details.subjects && (
+              <div>
+                <p className="font-semibold text-ink">Core subjects</p>
+                <p className="mt-1">{details.subjects.join(", ")}</p>
+              </div>
+            )}
+
+            {details.tech && (
+              <div>
+                <p className="font-semibold text-ink">Tools</p>
+                <p className="mt-1">{details.tech.join(", ")}</p>
+              </div>
+            )}
+
+            {details.endorsers?.map((endorser) => (
+              <figure key={endorser.name} className="border-l-2 border-violet/40 pl-4">
+                {endorser.quotes.map((quote) => (
+                  <blockquote key={quote} className="mt-2 font-serif text-[1.0625rem] leading-relaxed text-ink first:mt-0">
+                    “{quote}”
+                  </blockquote>
+                ))}
+                <figcaption className="mt-2 text-sm text-ink-3">
+                  {endorser.name}, {endorser.title}
+                </figcaption>
+              </figure>
+            ))}
           </div>
         </div>
       </div>
-    </SectionWrapper>
+    </div>
   );
 }

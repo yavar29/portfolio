@@ -1,236 +1,112 @@
-"use client";
+/* eslint-disable @next/next/no-img-element -- static export ships pre-optimized AVIF/WebP sources */
+import type { CSSProperties } from "react";
+import { ArrowUpRight, Download, Github, Linkedin } from "lucide-react";
+import { RESUME, SOCIAL_LINKS } from "@/lib/constants";
+import { professionalCert } from "@/lib/data";
 
-import Image from "next/image";
-import { motion } from "framer-motion";
-import { Github, Linkedin, Mail } from "lucide-react";
-import { SOCIAL_LINKS } from "@/lib/constants";
+const delay = (ms: number) => ({ "--d": `${ms}ms` }) as CSSProperties;
 
-/* ─── Tag size system ─── */
-const SIZE_CLS: Record<string, string> = {
-  sm: "px-3 py-1 text-[10px]",
-  md: "px-4 py-1.5 text-xs",
-  lg: "px-5 py-2 text-[13px]",
-};
-
-interface FloatingTag {
-  label: string;
-  x: string;
-  y: string;
-  delay: number;
-  size: "sm" | "md" | "lg";
-}
-
-const floatingTags: FloatingTag[] = [
-  // Top row — spread wide
-  { label: "LangChain",     x: "5%",  y: "14%", delay: 0,   size: "lg" },
-  { label: "PyTorch",        x: "82%", y: "12%", delay: 0.6, size: "lg" },
-  // Upper-mid — staggered left/right
-  { label: "MCP",            x: "20%", y: "30%", delay: 0.4, size: "md" },
-  { label: "Pinecone",       x: "80%", y: "28%", delay: 1.3, size: "sm" },
-  // Mid row — offset from center, not too close to photo
-  { label: "AWS",            x: "4%",  y: "44%", delay: 0.9, size: "md" },
-  { label: "LangSmith",      x: "85%", y: "42%", delay: 1.0, size: "sm" },
-  // Lower-mid — spread wide
-  { label: "GCP",            x: "18%", y: "56%", delay: 0.7, size: "md" },
-  { label: "LangGraph",      x: "78%", y: "54%", delay: 1.5, size: "md" },
-  // Bottom row — wide and low
-  { label: "RAG Pipelines",  x: "3%",  y: "68%", delay: 1.2, size: "md" },
-  { label: "Claude Code",   x: "8%",  y: "78%", delay: 0.8, size: "md" },
-  { label: "Multi-Agent AI", x: "75%", y: "66%", delay: 0.3, size: "lg" },
-  { label: "LLMOps",         x: "86%", y: "76%", delay: 0.5, size: "md" },
-];
-
-/* Spring-like cubic bezier for premium entrance feel */
-const EASE_SPRING: [number, number, number, number] = [0.16, 1, 0.3, 1];
+const secondaryButton =
+  "inline-flex items-center gap-2 rounded-full border border-line bg-white/70 px-3.5 py-3 text-sm font-medium text-ink transition-colors duration-200 hover:border-ink-3 sm:px-5 sm:text-[0.9375rem]";
 
 export default function HeroSection() {
   return (
-    <section
-      id="hero"
-      className="relative min-h-screen flex items-center justify-center bg-hero-gradient overflow-hidden pt-16 border-b-2 border-black"
-    >
-      {/* ── Dot grid pattern overlay ── */}
-      <div className="pointer-events-none absolute inset-0 hero-dots opacity-[0.3]" />
-
-      {/* ── Animated gradient blobs ── */}
-      <div className="pointer-events-none absolute -top-32 -right-32 h-[700px] w-[700px] rounded-full bg-lavender-400/30 blur-3xl animate-mesh-drift-1" />
-      <div className="pointer-events-none absolute -bottom-32 -left-32 h-[550px] w-[550px] rounded-full bg-teal-300/35 blur-3xl animate-mesh-drift-2" />
-      <div className="pointer-events-none absolute top-1/3 left-1/2 -translate-x-1/2 h-[550px] w-[550px] rounded-full bg-violet-300/35 blur-3xl animate-mesh-drift-3" />
+    <section id="top" className="relative overflow-hidden pb-6 pt-28 sm:pt-32 lg:pb-24 lg:pt-36">
       <div
-        className="pointer-events-none absolute bottom-1/4 right-1/4 h-[350px] w-[350px] rounded-full bg-amber-200/30 blur-3xl animate-mesh-drift-1"
-        style={{ animationDelay: "-8s" }}
-      />
-      <div
-        className="pointer-events-none absolute top-[15%] left-[10%] h-[250px] w-[250px] rounded-full bg-rose-200/25 blur-3xl animate-mesh-drift-2"
-        style={{ animationDelay: "-5s" }}
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(55%_60%_at_78%_30%,#eee8fa_0%,rgba(251,250,254,0)_70%)]"
       />
 
-      {/* ── Floating accent nodes ── */}
-      <div className="pointer-events-none absolute top-[15%] right-[12%] h-2.5 w-2.5 rounded-full bg-brand-primary/25 animate-float-gentle shadow-[0_0_10px_rgba(108,72,197,0.15)]" />
-      <div
-        className="pointer-events-none absolute top-[65%] left-[8%] h-2 w-2 rounded-full bg-teal-400/20 animate-float-gentle-alt"
-        style={{ animationDelay: "1.5s" }}
-      />
-      <div
-        className="pointer-events-none absolute bottom-[20%] right-[6%] h-2 w-2 rounded-full bg-amber-400/20 animate-float-gentle"
-        style={{ animationDelay: "2.5s" }}
-      />
+      <div className="container-page relative grid items-end gap-14 md:grid-cols-12 md:gap-8 lg:gap-10">
+        <div className="md:col-span-7">
+          <h1 className="t-display rise text-ink">Yavar Khan</h1>
+          <p
+            className="rise mt-5 text-[1.625rem] font-semibold leading-tight tracking-tight text-violet-deep sm:text-[1.875rem]"
+            style={delay(80)}
+          >
+            AI Engineer
+          </p>
+          <p className="t-lead rise mt-4 max-w-[36ch] text-ink-2" style={delay(160)}>
+            Building Claude-based decision systems as the first engineer at Aerveil.
+          </p>
 
-      {/* ── Pulse ring ── */}
-      <div className="pointer-events-none absolute top-[25%] left-[15%] hidden lg:block">
-        <div className="relative h-3 w-3">
-          <span className="absolute inset-0 rounded-full bg-lavender-400/20 animate-pulse-ring" />
-          <span className="absolute inset-[4px] rounded-full bg-lavender-400/35" />
+          <div className="rise mt-8 flex flex-wrap gap-2 sm:gap-3" style={delay(240)}>
+            <a
+              href={RESUME.href}
+              download={RESUME.filename}
+              className="inline-flex items-center gap-2 rounded-full bg-ink px-3.5 py-3 text-sm font-medium text-paper transition-colors duration-200 hover:bg-violet-deep sm:px-5 sm:text-[0.9375rem]"
+            >
+              <Download aria-hidden className="size-4" />
+              Resume
+            </a>
+            <a href={SOCIAL_LINKS.github} target="_blank" rel="noopener noreferrer" className={secondaryButton}>
+              <Github aria-hidden className="size-4" />
+              GitHub
+            </a>
+            <a href={SOCIAL_LINKS.linkedin} target="_blank" rel="noopener noreferrer" className={secondaryButton}>
+              <Linkedin aria-hidden className="size-4" />
+              LinkedIn
+            </a>
+          </div>
+
+          <a
+            href={professionalCert.verifyUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rise group mt-12 flex max-w-[30rem] items-center gap-4 rounded-[1.25rem] border border-line bg-white/80 p-3 pr-5 transition-colors duration-200 hover:border-violet/40"
+            style={delay(360)}
+          >
+            <img
+              src="/badges/claude-certified-architect-professional-144.webp"
+              alt=""
+              width={72}
+              height={72}
+              className="size-[72px] shrink-0"
+            />
+            <span className="min-w-0 flex-1">
+              <span className="block font-semibold leading-snug text-ink">{professionalCert.title}</span>
+              <span className="mt-0.5 block text-sm text-ink-3">
+                Issued by {professionalCert.issuer}, {professionalCert.date}
+              </span>
+            </span>
+            <span className="flex shrink-0 items-center gap-1 text-sm font-medium text-violet-deep">
+              <span className="sr-only sm:not-sr-only">Verify</span>
+              <ArrowUpRight
+                aria-hidden
+                className="size-4 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+              />
+            </span>
+          </a>
+        </div>
+
+        <div className="rise relative mx-auto w-full max-w-[17rem] sm:max-w-[22rem] md:col-span-5 md:mr-0 lg:max-w-[27rem]" style={delay(120)}>
+          <div
+            aria-hidden
+            className="absolute inset-x-0 bottom-0 top-[14%] rounded-t-full bg-gradient-to-b from-violet-wash to-paper-2"
+          />
+          <picture>
+            <source
+              type="image/avif"
+              srcSet="/images/yavar-hero-480.avif 480w, /images/yavar-hero-720.avif 720w, /images/yavar-hero-896.avif 896w"
+              sizes="(min-width: 1024px) 432px, (min-width: 640px) 352px, 272px"
+            />
+            <source
+              type="image/webp"
+              srcSet="/images/yavar-hero-480.webp 480w, /images/yavar-hero-720.webp 720w, /images/yavar-hero-896.webp 896w"
+              sizes="(min-width: 1024px) 432px, (min-width: 640px) 352px, 272px"
+            />
+            <img
+              src="/images/yavar-hero-720.webp"
+              alt="Portrait of Yavar Khan"
+              width={896}
+              height={1152}
+              fetchPriority="high"
+              decoding="async"
+              className="relative h-auto w-full"
+            />
+          </picture>
         </div>
       </div>
-
-      {/* ── Floating tech tags (desktop only) ── */}
-      {floatingTags.map((tag) => (
-        <motion.div
-          key={tag.label}
-          className="hidden lg:block absolute z-20 pointer-events-none"
-          style={{ left: tag.x, top: tag.y }}
-          initial={{ opacity: 0, scale: 0.7 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: tag.delay + 1.0, duration: 0.5, ease: EASE_SPRING }}
-        >
-          <motion.div
-            className={`
-              rounded-full bg-white/80 backdrop-blur-sm border border-gray-200/60
-              shadow-lg text-gray-600
-              font-semibold font-[family-name:var(--font-heading)]
-              ${SIZE_CLS[tag.size]}
-            `}
-            animate={{
-              y: [0, -(8 + tag.delay * 4), 0],
-              x: [0, tag.delay % 2 === 0 ? 5 : -5, 0],
-              rotate: [0, tag.delay % 2 === 0 ? 1.5 : -1.5, 0],
-            }}
-            transition={{
-              duration: 5 + tag.delay * 1.5,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          >
-            {tag.label}
-          </motion.div>
-        </motion.div>
-      ))}
-
-      {/* ── Left social sidebar ── */}
-      <div className="hidden lg:flex fixed left-6 top-1/2 -translate-y-1/2 z-40 flex-col items-center gap-5">
-        <div className="h-16 w-px bg-gray-300" />
-        <a
-          href={SOCIAL_LINKS.github}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-[#333] hover:scale-110 transition-transform"
-          aria-label="GitHub"
-        >
-          <Github size={20} />
-        </a>
-        <a
-          href={SOCIAL_LINKS.linkedin}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-[#0A66C2] hover:scale-110 transition-transform"
-          aria-label="LinkedIn"
-        >
-          <Linkedin size={20} />
-        </a>
-        <a
-          href={SOCIAL_LINKS.email}
-          className="text-[#EA4335] hover:scale-110 transition-transform"
-          aria-label="Email"
-        >
-          <Mail size={20} />
-        </a>
-        <div className="h-16 w-px bg-gray-300" />
-      </div>
-
-      {/* ── Centered stacked content ── */}
-      <div className="mx-auto flex max-w-5xl flex-col items-center justify-center px-4 sm:px-6 lg:px-8 text-center">
-        {/* ── Photo with multi-ring system ── */}
-        <motion.div
-          className="relative mx-auto mb-4 lg:mb-6 w-52 sm:w-[16rem] lg:w-[20rem] xl:w-[26rem] flex items-end justify-center"
-          initial={{ opacity: 0, y: 40, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.8, ease: EASE_SPRING }}
-        >
-          {/* Dashed boundary ring */}
-          <div className="absolute bottom-[-8px] left-1/2 -translate-x-1/2 h-[15rem] w-[15rem] sm:h-[18rem] sm:w-[18rem] lg:h-[22rem] lg:w-[22rem] xl:h-[28rem] xl:w-[28rem] rounded-full border-2 border-dashed border-lavender-400/40 pointer-events-none" />
-
-          {/* Single colored circle behind photo */}
-          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 h-44 w-44 sm:h-52 sm:w-52 lg:h-[17rem] lg:w-[17rem] xl:h-[22rem] xl:w-[22rem] rounded-full bg-gradient-to-br from-lavender-300 via-brand-primary/20 to-teal-200/50" />
-
-          <Image
-            src="/images/YavarPersonalPhoto1.png"
-            alt="Yavar Khan"
-            width={680}
-            height={874}
-            priority
-            className="relative z-10 h-auto w-full object-contain photo-cutout lg:max-h-[40vh] xl:max-h-none"
-          />
-        </motion.div>
-
-        {/* ── Name ── */}
-        <motion.h1
-          className="mb-3 text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl xl:text-8xl font-[family-name:var(--font-display)]"
-          style={{
-            background:
-              "linear-gradient(135deg, #1a1a2e 0%, #2d1b69 50%, #1a1a2e 100%)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            backgroundClip: "text",
-          }}
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.3, ease: EASE_SPRING }}
-        >
-          Yavar Khan
-        </motion.h1>
-
-        {/* ── Gradient accent line ── */}
-        <motion.div
-          className="mx-auto mb-3 lg:mb-5 h-[3px] w-20 rounded-full bg-gradient-to-r from-brand-primary via-teal-400 to-amber-400"
-          initial={{ scaleX: 0 }}
-          animate={{ scaleX: 1 }}
-          transition={{ duration: 0.6, delay: 0.4, ease: "easeOut" }}
-        />
-
-        {/* ── Subtitle ── */}
-        <motion.p
-          className="mb-3 lg:mb-5 text-sm font-bold tracking-[0.3em] uppercase sm:text-base lg:text-lg font-[family-name:var(--font-heading)]"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.5, ease: EASE_SPRING }}
-        >
-          <span className="text-brand-primary">AI Engineer</span>
-          <span className="mx-3 inline-flex items-center">
-            <span className="inline-block h-1.5 w-1.5 rotate-45 bg-gradient-to-br from-lavender-400 to-teal-400" />
-          </span>
-          <span className="text-teal-600">Software Engineer</span>
-        </motion.p>
-
-        {/* ── Status badge ── */}
-        <motion.div
-          className="inline-flex items-center gap-2.5 rounded-full border border-lavender-300/50 bg-gradient-to-r from-lavender-100/60 via-lavender-50/40 to-teal-50/50 backdrop-blur-sm px-5 py-2.5 shadow-sm"
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.7, ease: "easeOut" }}
-        >
-          <span className="relative flex h-2.5 w-2.5">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-primary opacity-50" />
-            <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-brand-primary" />
-          </span>
-          <span className="text-sm font-semibold tracking-wide text-brand-dark/80 font-[family-name:var(--font-heading)]">
-            Building WeatherWise.ai
-            <span className="mx-1.5 text-lavender-400">|</span>
-            Available for Opportunities
-          </span>
-        </motion.div>
-      </div>
-
     </section>
   );
 }

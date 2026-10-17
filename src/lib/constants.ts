@@ -1,12 +1,16 @@
 export const SITE = {
   name: "Yavar Khan",
-  title: "Yavar Khan | AI & Software Engineer",
+  title: "Yavar Khan – AI Engineer",
   description:
-    "Portfolio of Yavar Khan — AI/ML Engineer bridging Software Engineering and Artificial Intelligence to build intelligent, scalable systems.",
-  url: "https://yavarkhan.dev",
+    "Yavar Khan is an AI Engineer at Aerveil building Claude-based decision systems, and a Claude Certified Architect – Professional.",
+  url: "https://yavarkhan.me",
   email: "yavarkhan1997@gmail.com",
-  phone: "(669)-339-8555",
   location: "San Jose, CA",
+};
+
+export const RESUME = {
+  href: "/Yavar_Khan_Resume.pdf",
+  filename: "Yavar_Khan_Resume.pdf",
 };
 
 // Cloudflare Turnstile
@@ -15,16 +19,16 @@ export const TURNSTILE_SITE_KEY =
 
 export const SOCIAL_LINKS = {
   github: "https://github.com/yavar29",
-  linkedin: "https://linkedin.com/in/yavar-khan29",
+  linkedin: "https://www.linkedin.com/in/yavar-khan29/",
   email: `mailto:${SITE.email}`,
 };
 
 export const NAV_ITEMS = [
-  { label: "Home", href: "#hero" },
   { label: "About", href: "#about" },
   { label: "Journey", href: "#journey" },
-  { label: "Featured", href: "#featured" },
+  { label: "Aerveil", href: "#aerveil" },
   { label: "Projects", href: "#projects" },
   { label: "Skills", href: "#skills" },
+  { label: "Certifications", href: "#certifications" },
   { label: "Contact", href: "#contact" },
 ] as const;

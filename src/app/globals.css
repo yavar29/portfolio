@@ -1,246 +1,174 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-brand-primary: #6C48C5;
-  --color-brand-secondary: #F0ECF9;
-  --color-brand-dark: #111827;
-  --color-brand-light: #FAFAFA;
+  --color-paper: #fbfafe;
+  --color-paper-2: #f4f1fa;
+  --color-ink: #1c1530;
+  --color-ink-2: #4a4260;
+  --color-ink-3: #6e6785;
+  --color-line: #e4dfee;
+  --color-violet: #6c48c5;
+  --color-violet-deep: #5a3ba6;
+  --color-violet-wash: #eee8fa;
+  --color-night: #17112a;
+  --color-night-2: #221a3a;
+  --color-on-night: #f3effb;
+  --color-on-night-2: #b9b0d0;
+  --color-violet-glow: #b49cf0;
 
-  --color-lavender-50: #F9F7FF;
-  --color-lavender-100: #F0ECF9;
-  --color-lavender-200: #E2DAF2;
-  --color-lavender-300: #C9BBE5;
-  --color-lavender-400: #A78DD4;
-  --color-lavender-500: #8B6FC0;
-  --color-lavender-600: #6C48C5;
-  --color-lavender-700: #5A3BA6;
-  --color-lavender-800: #4A3088;
-  --color-lavender-900: #35215F;
+  --font-sans: var(--font-schibsted), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-newsreader), ui-serif, Georgia, serif;
 
-  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-heading: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Playfair Display", ui-serif, Georgia, serif;
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @layer base {
   html {
     scroll-behavior: smooth;
-    overflow-x: hidden;
+    scroll-padding-top: 5rem;
+    -webkit-text-size-adjust: 100%;
   }
 
   body {
-    background-color: #FFFFFF;
-    color: var(--color-brand-dark);
+    background-color: var(--color-paper);
+    color: var(--color-ink);
     font-family: var(--font-sans);
+    font-size: 1.0625rem;
+    line-height: 1.65;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    overflow-x: hidden;
+    text-rendering: optimizeLegibility;
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-heading);
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background: var(--color-violet-wash);
+    color: var(--color-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-violet);
+    outline-offset: 3px;
+    border-radius: 4px;
   }
 }
 
-@layer utilities {
-  .text-gradient {
-    background: linear-gradient(135deg, #6C48C5 0%, #0EA5E9 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+@layer components {
+  .container-page {
+    width: 100%;
+    max-width: 76rem;
+    margin-inline: auto;
+    padding-inline: 1.25rem;
   }
 
-  .bg-hero-gradient {
-    background: linear-gradient(170deg, #F3EFF9 0%, #F7F4FC 30%, #FCFCFE 55%, #F2FAF6 100%);
+  @media (min-width: 640px) {
+    .container-page {
+      padding-inline: 2rem;
+    }
   }
 
-  .bg-about-gradient {
-    background: linear-gradient(170deg, #F0ECF9 0%, #FFFFFF 50%, #EFF6FF 100%);
+  @media (min-width: 1024px) {
+    .container-page {
+      padding-inline: 2.5rem;
+    }
   }
 
-  .bg-featured-gradient {
-    background: linear-gradient(170deg, #EFF6FF 0%, #F0F9FF 50%, #F0FDFA 100%);
+  .section-pad {
+    padding-block: clamp(5rem, 4rem + 5vw, 9rem);
   }
 
-  .bg-projects-gradient {
-    background: linear-gradient(170deg, #FFFBEB 0%, #FFF7ED 50%, #FFFFFF 100%);
+  .t-display {
+    font-family: var(--font-serif);
+    font-size: clamp(3.4rem, 2rem + 6.4vw, 7.25rem);
+    line-height: 0.95;
+    letter-spacing: -0.025em;
   }
 
-  .bg-journey-gradient {
-    background: linear-gradient(175deg, #fef9f0 0%, #f8f2e4 28%, #f2ede4 52%, #eef2f8 76%, #eaf0fb 100%);
+  .t-h2 {
+    font-size: clamp(2.375rem, 1.7rem + 2.8vw, 3.75rem);
+    line-height: 1.04;
   }
 
-  .bg-skills-gradient {
-    background: linear-gradient(170deg, #F3F0FF 0%, #F9F7FF 40%, #FFFFFF 70%, #F0FDFA 100%);
+  .t-h3 {
+    font-size: clamp(1.625rem, 1.35rem + 1vw, 2.125rem);
+    line-height: 1.12;
   }
 
-  .photo-cutout {
-    filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.15)) drop-shadow(0 8px 16px rgba(0, 0, 0, 0.1));
+  .t-lead {
+    font-size: clamp(1.125rem, 1rem + 0.45vw, 1.3125rem);
+    line-height: 1.55;
   }
 
-  /* ── Hero dot grid pattern ── */
-  .hero-dots {
-    background-image:
-      radial-gradient(circle, #c9bbe5 1px, transparent 1px),
-      radial-gradient(circle, #b8e8d8 0.5px, transparent 0.5px);
-    background-size: 28px 28px, 28px 28px;
-    background-position: 0 0, 14px 14px;
+  /* Underline that grows from the left; used for inline text links. */
+  .link {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 100% 1px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    padding-bottom: 1px;
+    transition: background-size 0.25s var(--ease-out-quint), color 0.2s;
   }
 
-  /* ── Roadmap yellow dash animation ── */
-  .roadmap-dashes {
-    animation: roadmap-dash-scroll 15s linear infinite;
+  .link:hover {
+    background-size: 100% 2px;
   }
 
-  /* ── Hide scrollbar for horizontal tab strips ── */
-  .hide-scrollbar::-webkit-scrollbar {
-    display: none;
+  /* Hero load sequence: one orchestrated moment, pure CSS so it never waits on JS. */
+  .rise {
+    animation: rise 0.8s var(--ease-out-quint) both;
+    animation-delay: var(--d, 0ms);
   }
-  .hide-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+
+  /* Disclosure panel: animates to and from its natural height. */
+  .disclosure {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.35s var(--ease-out-quint);
+  }
+
+  .disclosure[data-open="true"] {
+    grid-template-rows: 1fr;
+  }
+
+  .disclosure > div {
+    overflow: hidden;
   }
 }
 
-@keyframes roadmap-dash-scroll {
+/* Starts at 0.01 rather than 0 so the hero still counts as painted for Largest Contentful Paint. */
+@keyframes rise {
+  from {
+    opacity: 0.01;
+    transform: translateY(14px);
+  }
   to {
-    stroke-dashoffset: -200;
+    opacity: 1;
+    transform: none;
   }
 }
 
-/* ── Featured section gradient mesh drift ── */
-@keyframes mesh-drift-1 {
-  0%, 100% { transform: translate(0, 0); }
-  50% { transform: translate(30px, -20px); }
-}
-@keyframes mesh-drift-2 {
-  0%, 100% { transform: translate(0, 0); }
-  50% { transform: translate(-25px, 15px); }
-}
-@keyframes mesh-drift-3 {
-  0%, 100% { transform: translate(0, 0); }
-  50% { transform: translate(15px, 25px); }
-}
-
-@layer utilities {
-  .animate-mesh-drift-1 {
-    animation: mesh-drift-1 20s ease-in-out infinite;
-  }
-  .animate-mesh-drift-2 {
-    animation: mesh-drift-2 25s ease-in-out infinite;
-  }
-  .animate-mesh-drift-3 {
-    animation: mesh-drift-3 22s ease-in-out infinite;
-  }
-}
-
-/* ── Build log floating node animations ── */
-@keyframes float-gentle {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-14px); }
-}
-@keyframes float-gentle-alt {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(12px); }
-}
-@keyframes pulse-ring {
-  0% { transform: scale(1); opacity: 0.4; }
-  100% { transform: scale(2.4); opacity: 0; }
-}
-
-@layer utilities {
-  .animate-float-gentle {
-    animation: float-gentle 6s ease-in-out infinite;
-  }
-  .animate-float-gentle-alt {
-    animation: float-gentle-alt 8s ease-in-out infinite;
-  }
-  .animate-pulse-ring {
-    animation: pulse-ring 3s cubic-bezier(0, 0, 0.2, 1) infinite;
-  }
-}
-
-/* ── Contact map radar animations ── */
-@keyframes radar-ping {
-  0% {
-    transform: scale(1);
-    opacity: 0.4;
-  }
-  100% {
-    transform: scale(2.2);
-    opacity: 0;
-  }
-}
-
-@keyframes radar-ping-sm {
-  0% {
-    transform: scale(1);
-    opacity: 0.5;
-  }
-  100% {
-    transform: scale(1.8);
-    opacity: 0;
-  }
-}
-
-@keyframes radar-scan {
-  0% {
-    transform: scale(1);
-    opacity: 0.6;
-  }
-  100% {
-    transform: scale(12);
-    opacity: 0;
-  }
-}
-
-@layer utilities {
-  .animate-radar-ping {
-    animation: radar-ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
   }
 
-  .animate-radar-ping-sm {
-    animation: radar-ping-sm 2s cubic-bezier(0, 0, 0.2, 1) infinite 0.4s;
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
   }
-
-  .animate-radar-scan {
-    animation: radar-scan 3s cubic-bezier(0, 0, 0.2, 1) infinite;
-  }
-}
-
-/* ── BuildLog radar sweep + isobar animations ── */
-@keyframes radar-sweep {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
-}
-
-@keyframes isobar-flow {
-  from { stroke-dashoffset: 0; }
-  to   { stroke-dashoffset: -200; }
-}
-
-@layer utilities {
-  .animate-radar-sweep {
-    transform-origin: 210px 210px;
-    animation: radar-sweep 10s linear infinite;
-  }
-  .animate-isobar-flow {
-    animation: isobar-flow 25s linear infinite;
-  }
-}
-
-/* ── Skills marquee scroll ── */
-@keyframes marquee-left {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
-}
-@keyframes marquee-right {
-  from { transform: translateX(-50%); }
-  to   { transform: translateX(0); }
-}
-
-/* ── Cert card shimmer border ── */
-@keyframes shimmer-border {
-  0%   { background-position: -200% center; }
-  100% { background-position: 200% center; }
 }

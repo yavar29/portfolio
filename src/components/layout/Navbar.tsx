@@ -1,80 +1,128 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Menu, Download } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Download, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { NAV_ITEMS } from "@/lib/constants";
-import useActiveSection from "@/hooks/useActiveSection";
-import MobileMenu from "./MobileMenu";
+import { NAV_ITEMS, RESUME } from "@/lib/constants";
+
+const SECTION_IDS = NAV_ITEMS.map((item) => item.href.slice(1));
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const active = useActiveSection();
+  const [open, setOpen] = useState(false);
+  const [active, setActive] = useState("");
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) setActive(entry.target.id);
+        }
+      },
+      { rootMargin: "-45% 0px -50% 0px" }
+    );
+    for (const id of SECTION_IDS) {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    }
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
+
   return (
-    <>
-      <nav
-        className={cn(
-          "fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b-2 border-black",
-          scrolled
-            ? "bg-white/90 backdrop-blur-md shadow-sm"
-            : "bg-white"
-        )}
-      >
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          {/* Spacer for balance on desktop */}
-          <div className="hidden md:block w-32" />
+    <header
+      className={cn(
+        "fixed inset-x-0 top-0 z-50 border-b transition-[background-color,border-color] duration-300",
+        scrolled || open
+          ? "border-line bg-paper/90 backdrop-blur-md"
+          : "border-transparent bg-transparent"
+      )}
+    >
+      <nav aria-label="Primary" className="container-page flex h-16 items-center justify-between gap-6">
+        <a href="#top" className="font-serif text-[1.375rem] leading-none tracking-tight text-ink">
+          Yavar Khan
+        </a>
 
-          {/* Desktop nav – centered */}
-          <ul className="hidden items-center gap-1 md:flex">
-            {NAV_ITEMS.map(({ label, href }) => {
-              const sectionId = href.replace("#", "");
-              return (
-                <li key={href}>
-                  <a
-                    href={href}
-                    className={cn(
-                      "rounded-full px-4 py-2 text-sm font-bold transition-colors",
-                      active === sectionId
-                        ? "bg-brand-primary/10 text-brand-primary"
-                        : "text-brand-dark/70 hover:text-brand-primary"
-                    )}
-                  >
-                    {label}
-                  </a>
-                </li>
-              );
-            })}
-          </ul>
+        <ul className="hidden items-center gap-7 lg:flex">
+          {NAV_ITEMS.map((item) => {
+            const isActive = active === item.href.slice(1);
+            return (
+              <li key={item.href}>
+                <a
+                  href={item.href}
+                  aria-current={isActive ? "true" : undefined}
+                  className={cn(
+                    "text-[0.9375rem] transition-colors duration-200 hover:text-ink",
+                    isActive ? "text-ink" : "text-ink-3"
+                  )}
+                >
+                  {item.label}
+                </a>
+              </li>
+            );
+          })}
+        </ul>
 
-          {/* Download CV button */}
+        <div className="flex items-center gap-2">
           <a
-            href="/YavarKhan_Resume.pdf"
-            className="hidden md:inline-flex items-center gap-2 rounded-full bg-brand-dark text-white px-5 py-2 text-sm font-semibold hover:bg-brand-dark/85 transition-colors"
+            href={RESUME.href}
+            download={RESUME.filename}
+            className="hidden items-center gap-2 rounded-full bg-ink px-4 py-2 text-sm font-medium text-paper transition-colors duration-200 hover:bg-violet-deep sm:inline-flex"
           >
-            Download CV
-            <Download size={14} />
+            <Download aria-hidden className="size-4" />
+            Resume
           </a>
-
-          {/* Mobile hamburger */}
           <button
-            onClick={() => setMobileOpen(true)}
-            className="ml-auto rounded-lg p-2 text-brand-dark hover:bg-gray-100 md:hidden"
-            aria-label="Open menu"
+            type="button"
+            onClick={() => setOpen((v) => !v)}
+            aria-expanded={open}
+            aria-controls="mobile-nav"
+            aria-label={open ? "Close menu" : "Open menu"}
+            className="-mr-2 grid size-11 place-items-center rounded-full text-ink lg:hidden"
           >
-            <Menu size={24} />
+            {open ? <X aria-hidden className="size-5" /> : <Menu aria-hidden className="size-5" />}
           </button>
         </div>
       </nav>
 
-      <MobileMenu open={mobileOpen} onClose={() => setMobileOpen(false)} active={active} />
-    </>
+      <div id="mobile-nav" hidden={!open} className="border-t border-line lg:hidden">
+        <ul className="container-page py-4">
+          {NAV_ITEMS.map((item) => (
+            <li key={item.href}>
+              <a
+                href={item.href}
+                onClick={() => setOpen(false)}
+                className="block py-2.5 font-serif text-2xl text-ink"
+              >
+                {item.label}
+              </a>
+            </li>
+          ))}
+          <li className="mt-3 border-t border-line pt-5 sm:hidden">
+            <a
+              href={RESUME.href}
+              download={RESUME.filename}
+              className="inline-flex items-center gap-2 rounded-full bg-ink px-5 py-3 text-[0.9375rem] font-medium text-paper"
+            >
+              <Download aria-hidden className="size-4" />
+              Download resume
+            </a>
+          </li>
+        </ul>
+      </div>
+    </header>
   );
 }
