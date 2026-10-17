@@ -3,7 +3,6 @@ import type { CSSProperties } from "react";
 import { ArrowUpRight, Download, Github, Linkedin } from "lucide-react";
 import { RESUME, SITE, SOCIAL_LINKS } from "@/lib/constants";
 import { professionalCert } from "@/lib/data";
-import HeroAmbient from "./HeroAmbient";
 
 const BADGE = "/badges/claude-certified-architect-professional-216.webp";
 
@@ -15,12 +14,6 @@ const secondaryButton =
 export default function HeroSection() {
   return (
     <section id="top" className="on-dark relative overflow-hidden bg-night-deep pb-10 pt-28 text-on-night sm:pt-32 lg:pb-8 lg:pt-28">
-      <HeroAmbient />
-      <div
-        aria-hidden
-        className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-violet-glow/40 to-transparent"
-      />
-
       <div className="container-page relative grid items-end gap-12 md:grid-cols-12 md:gap-8 lg:gap-10">
         <div className="md:col-span-7">
           <h1 className="t-display rise text-white">Yavar Khan</h1>
@@ -89,14 +82,14 @@ export default function HeroSection() {
         </div>
 
         <div
-          className="rise relative mx-auto w-full max-w-[17rem] sm:max-w-[22rem] md:col-span-5 md:mr-0 lg:max-w-[27rem]"
+          className="rise relative -mb-10 mx-auto w-full max-w-[17rem] sm:max-w-[22rem] md:col-span-5 md:mr-0 lg:-mb-8 lg:max-w-[27rem]"
           style={delay(100)}
         >
-          {/* Bottom of the portrait and its arch dissolve into the page instead of ending on a hard line. */}
-          <div className="relative [mask-image:linear-gradient(to_bottom,#000_76%,transparent)]">
+          {/* Portrait and arch stand on the hero's bottom edge (negative margin cancels its padding). */}
+          <div className="relative">
             <div
               aria-hidden
-              className="absolute inset-x-0 bottom-0 top-[14%] rounded-t-full border-x border-t border-white/10 bg-gradient-to-b from-[rgb(150_118_240/0.5)] via-[rgb(108_72_197/0.22)] to-transparent"
+              className="absolute inset-x-0 bottom-0 top-[14%] rounded-t-full bg-violet"
             />
             <picture>
               <source
