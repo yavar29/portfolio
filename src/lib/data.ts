@@ -96,7 +96,8 @@ export interface Milestone {
   place?: string;
   summary?: string;
   highlights?: string[];
-  badge?: string;
+  // Logo or badge shown in the milestone's marker on the road.
+  logo?: { src: string; width: number; height: number };
   links?: { label: string; href: string; external?: boolean }[];
   details?: {
     subRoles?: SubRole[];
@@ -107,51 +108,74 @@ export interface Milestone {
   };
 }
 
+// Newest first.
 export const milestones: Milestone[] = [
   {
-    id: "amity",
-    period: "Jul 2016 – May 2020",
-    year: "2016",
-    title: "B.Tech, Information Technology",
-    org: "Amity University",
-    place: "India",
+    id: "cca-professional",
+    period: professionalCert.date,
+    year: "2026",
+    title: professionalCert.title,
+    org: professionalCert.issuer,
+    logo: { src: professionalCert.badge, width: 320, height: 320 },
+    links: [{ label: professionalCert.verifyLabel, href: professionalCert.verifyUrl, external: true }],
+  },
+  {
+    id: "cca-foundations",
+    period: foundationsCert.date,
+    year: "2026",
+    title: foundationsCert.title,
+    org: foundationsCert.issuer,
+    logo: { src: foundationsCert.badge, width: 320, height: 320 },
+    links: [{ label: foundationsCert.verifyLabel, href: foundationsCert.verifyUrl, external: true }],
+  },
+  {
+    id: "aerveil",
+    period: "Mar 2026 – present",
+    year: "2026",
+    logo: { src: "/logos/aerveil.svg", width: 3548, height: 3622 },
+    title: "Founding AI Engineer",
+    org: "Aerveil",
+    place: "San Jose, CA",
     summary:
-      "Built a strong foundation in computer science fundamentals, algorithms and software development.",
+      "Building an AI decision platform that makes frost and spray calls for vineyards, block by block, delivered to growers on WhatsApp. I own it end to end: data pipelines, decision engines, LLM agents, evals and governance, and cloud infrastructure on GCP.",
+    highlights: ["Working directly with our first design partner"],
+    links: [
+      { label: "More about Aerveil", href: "#aerveil" },
+      { label: "aerveil.ai", href: "https://aerveil.ai", external: true },
+    ],
+  },
+  {
+    id: "buffalo",
+    period: "Aug 2024 – Dec 2025",
+    year: "2024",
+    logo: { src: "/logos/ub.svg", width: 3200, height: 1648 },
+    title: "M.S. Computer Science (AI/ML)",
+    org: "University at Buffalo, SUNY",
+    place: "Buffalo, NY",
+    summary:
+      "Went deep on the mathematics and practice of modern machine learning, from building Transformers and CNNs from scratch in PyTorch to optimization, loss functions and gradient flow.",
+    highlights: ["GPA 3.87 / 4.0"],
+    links: [
+      { label: "Degree certificate", href: "/YavarKhan_MS_Degree.pdf", external: true },
+      { label: "Transcript", href: "/YavarKhan_OfficialTranscript.pdf", external: true },
+    ],
     details: {
-      subjects: [
-        "Data Structures & Algorithms",
-        "Object-Oriented Programming",
-        "Database Management Systems",
-        "Operating Systems",
-        "Computer Networks",
-        "Software Engineering",
-        "Data Mining",
+      courses: [
+        { name: "Machine Learning", grade: "A" },
+        { name: "Deep Learning", grade: "A" },
+        { name: "Computer Security", grade: "A" },
+        { name: "Computer Vision & Image Processing", grade: "A-" },
+        { name: "Data Intensive Computing", grade: "A-" },
+        { name: "Analysis of Algorithms and Design", grade: "A-" },
       ],
-      tech: ["C++", "Java", "Python", "Linux", "MySQL"],
-      endorsers: [
-        {
-          name: "Sunil Kumar Chowdhary",
-          title: "Assistant Professor, Amity School of Engineering & Technology",
-          quotes: [
-            "Demonstrated a strong grasp of algorithmic principles and a keen ability to identify patterns and optimize code to provide solutions for complex computational problems.",
-            "A self-motivated innovator with the ability to grasp new concepts quickly and a desire to expand knowledge beyond the prescribed curriculum.",
-          ],
-        },
-        {
-          name: "Dr. Archana Singh",
-          title: "Professor & Head, Department of AI & ML",
-          quotes: [
-            "Displayed remarkable innovation and technical acumen in deciphering the complexities of a machine learning model and successfully implementing it.",
-            "Highly impressed by his performance and technical knowledge in Artificial Intelligence and Data Mining.",
-          ],
-        },
-      ],
+      tech: ["PyTorch", "Scikit-learn", "Transformers", "Reinforcement Learning", "spaCy", "Gensim"],
     },
   },
   {
     id: "accenture",
     period: "Dec 2020 – Aug 2023",
     year: "2020",
+    logo: { src: "/logos/accenture.svg", width: 2001, height: 2122 },
     title: "Software Engineering Associate → Analyst",
     org: "Accenture",
     place: "Pune, India",
@@ -210,58 +234,45 @@ export const milestones: Milestone[] = [
     },
   },
   {
-    id: "buffalo",
-    period: "Aug 2024 – Dec 2025",
-    year: "2024",
-    title: "M.S. Computer Science (AI/ML)",
-    org: "University at Buffalo, SUNY",
-    place: "Buffalo, NY",
+    id: "amity",
+    period: "Jul 2016 – May 2020",
+    year: "2016",
+    logo: { src: "/logos/amity.webp", width: 353, height: 414 },
+    title: "B.Tech, Information Technology",
+    org: "Amity University",
+    place: "India",
     summary:
-      "Went deep on the mathematics and practice of modern machine learning, from building Transformers and CNNs from scratch in PyTorch to optimization, loss functions and gradient flow.",
-    highlights: ["GPA 3.87 / 4.0"],
-    links: [
-      { label: "Degree certificate", href: "/YavarKhan_MS_Degree.pdf", external: true },
-      { label: "Transcript", href: "/YavarKhan_OfficialTranscript.pdf", external: true },
-    ],
+      "Built a strong foundation in computer science fundamentals, algorithms and software development.",
     details: {
-      courses: [
-        { name: "Machine Learning", grade: "A" },
-        { name: "Deep Learning", grade: "A" },
-        { name: "Computer Security", grade: "A" },
-        { name: "Computer Vision & Image Processing", grade: "A-" },
-        { name: "Data Intensive Computing", grade: "A-" },
-        { name: "Analysis of Algorithms and Design", grade: "A-" },
+      subjects: [
+        "Data Structures & Algorithms",
+        "Object-Oriented Programming",
+        "Database Management Systems",
+        "Operating Systems",
+        "Computer Networks",
+        "Software Engineering",
+        "Data Mining",
       ],
-      tech: ["PyTorch", "Scikit-learn", "Transformers", "Reinforcement Learning", "spaCy", "Gensim"],
+      tech: ["C++", "Java", "Python", "Linux", "MySQL"],
+      endorsers: [
+        {
+          name: "Sunil Kumar Chowdhary",
+          title: "Assistant Professor, Amity School of Engineering & Technology",
+          quotes: [
+            "Demonstrated a strong grasp of algorithmic principles and a keen ability to identify patterns and optimize code to provide solutions for complex computational problems.",
+            "A self-motivated innovator with the ability to grasp new concepts quickly and a desire to expand knowledge beyond the prescribed curriculum.",
+          ],
+        },
+        {
+          name: "Dr. Archana Singh",
+          title: "Professor & Head, Department of AI & ML",
+          quotes: [
+            "Displayed remarkable innovation and technical acumen in deciphering the complexities of a machine learning model and successfully implementing it.",
+            "Highly impressed by his performance and technical knowledge in Artificial Intelligence and Data Mining.",
+          ],
+        },
+      ],
     },
-  },
-  {
-    id: "aerveil",
-    period: "Mar 2026 – present",
-    year: "2026",
-    title: "AI Engineer",
-    org: "Aerveil",
-    place: "San Jose, CA",
-    summary: "First engineer at a pre-seed agtech startup.",
-    links: [{ label: "More about Aerveil", href: "#aerveil" }],
-  },
-  {
-    id: "cca-foundations",
-    period: foundationsCert.date,
-    year: "2026",
-    title: foundationsCert.title,
-    org: foundationsCert.issuer,
-    badge: foundationsCert.badge,
-    links: [{ label: foundationsCert.verifyLabel, href: foundationsCert.verifyUrl, external: true }],
-  },
-  {
-    id: "cca-professional",
-    period: professionalCert.date,
-    year: "2026",
-    title: professionalCert.title,
-    org: professionalCert.issuer,
-    badge: professionalCert.badge,
-    links: [{ label: professionalCert.verifyLabel, href: professionalCert.verifyUrl, external: true }],
   },
 ];
 

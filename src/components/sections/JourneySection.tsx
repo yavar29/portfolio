@@ -1,6 +1,6 @@
 "use client";
 
-/* eslint-disable @next/next/no-img-element -- static export ships pre-optimized WebP badges */
+/* eslint-disable @next/next/no-img-element -- static export ships pre-built SVG/WebP logos and badges */
 import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import {
   useMotionValue,
@@ -9,7 +9,7 @@ import {
   useScroll,
   useSpring,
 } from "motion/react";
-import { ArrowUpRight, ChevronDown } from "lucide-react";
+import { ArrowDown, ArrowUpRight, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { milestones, type Milestone } from "@/lib/data";
 
@@ -75,6 +75,17 @@ function fractionAtY(m: Measured, y: number) {
   return (lo + t) / SAMPLES;
 }
 
+// Milestones grouped by year (newest first); each keeps its overall index for the road.
+const yearGroups = milestones.reduce<{ year: string; items: { m: Milestone; i: number }[] }[]>(
+  (groups, m, i) => {
+    const current = groups[groups.length - 1];
+    if (current?.year === m.year) current.items.push({ m, i });
+    else groups.push({ year: m.year, items: [{ m, i }] });
+    return groups;
+  },
+  []
+);
+
 export default function JourneySection() {
   const listRef = useRef<HTMLOListElement>(null);
   const maskPathRef = useRef<SVGPathElement>(null);
@@ -88,7 +99,8 @@ export default function JourneySection() {
   const reduceMotion = useReducedMotion();
   const maskId = useId();
 
-  const { scrollYProgress } = useScroll({ target: listRef, offset: ["start 65%", "end 65%"] });
+  // The road is drawn up to 80% of the viewport height, so milestones arrive while still low on screen.
+  const { scrollYProgress } = useScroll({ target: listRef, offset: ["start 80%", "end 80%"] });
   const target = useMotionValue(0);
   const drawn = useSpring(target, { stiffness: 140, damping: 32, restDelta: 0.0005 });
 
@@ -163,18 +175,17 @@ export default function JourneySection() {
     if (!reduceMotion) paint(v);
   });
 
-  return (
-    <section id="journey" className="section-pad overflow-hidden bg-paper-2">
-      <div className="container-page">
-        <div className="max-w-[44rem]">
-          <h2 className="t-h2">Journey</h2>
-          <p className="t-lead mt-5 text-ink-2">
-            From an IT degree in India to production API engineering at Accenture, graduate study in
-            AI/ML in Buffalo, and applied AI at Aerveil.
-          </p>
-        </div>
+  const isArrived = (i: number) => !!reduceMotion || arrived < 0 || i < arrived;
 
-        <ol ref={listRef} className="relative mt-16 md:mt-24">
+  return (
+    <section
+      id="journey"
+      className="section-pad overflow-x-clip bg-paper-2 bg-[radial-gradient(circle,rgb(0_0_0/0.09)_1px,transparent_1.25px)] bg-[length:24px_24px]"
+    >
+      <div className="container-page">
+        <h2 className="t-h2">Journey</h2>
+
+        <ol ref={listRef} className="relative mt-14 md:mt-20">
           {layout && (
             <svg
               aria-hidden
@@ -230,20 +241,46 @@ export default function JourneySection() {
           <span
             ref={headRef}
             aria-hidden
-            className="pointer-events-none absolute left-0 top-0 z-20 -ml-[7px] -mt-[7px] size-3.5 rounded-full bg-ink opacity-0 shadow-[0_0_0_6px_rgba(0,0,0,0.14)]"
+            className="pointer-events-none absolute left-0 top-0 z-[5] -ml-[7px] -mt-[7px] size-3.5 rounded-full bg-ink opacity-0 shadow-[0_0_0_6px_rgba(0,0,0,0.14)]"
           />
 
-          {milestones.map((m, i) => (
-            <MilestoneItem
-              key={m.id}
-              milestone={m}
-              side={i % 2 === 0 ? "left" : "right"}
-              showYear={i === 0 || milestones[i - 1].year !== m.year}
-              arrived={!!reduceMotion || arrived < 0 || i < arrived}
-              markerRef={(el) => {
-                markerRefs.current[i] = el;
-              }}
-            />
+          {yearGroups.map((group, g) => (
+            <li
+              key={group.year}
+              className={cn(
+                "relative md:grid md:grid-cols-[14rem_minmax(0,1fr)]",
+                g < yearGroups.length - 1 && "pb-14 md:pb-16"
+              )}
+            >
+              {/* The year stays pinned beside its milestones, then the next year pushes it away. */}
+              <div aria-hidden className="hidden md:block">
+                <div
+                  data-year={group.year}
+                  data-reached={isArrived(group.items[0].i)}
+                  className="year-numeral sticky top-24 pr-8 text-right"
+                />
+              </div>
+              <p
+                aria-hidden
+                data-year={group.year}
+                data-reached={isArrived(group.items[0].i)}
+                className="year-numeral mb-6 pl-[4.25rem] md:hidden"
+              />
+
+              <ol>
+                {group.items.map(({ m, i }, k) => (
+                  <MilestoneItem
+                    key={m.id}
+                    milestone={m}
+                    last={k === group.items.length - 1}
+                    arrived={isArrived(i)}
+                    markerRef={(el) => {
+                      markerRefs.current[i] = el;
+                    }}
+                  />
+                ))}
+              </ol>
+            </li>
           ))}
         </ol>
       </div>
@@ -253,68 +290,48 @@ export default function JourneySection() {
 
 function MilestoneItem({
   milestone: m,
-  side,
-  showYear,
+  last,
   arrived,
   markerRef,
 }: {
   milestone: Milestone;
-  side: "left" | "right";
-  showYear: boolean;
+  last: boolean;
   arrived: boolean;
   markerRef: (el: HTMLSpanElement | null) => void;
 }) {
-  const left = side === "left";
-
   return (
-    <li className="relative grid grid-cols-[2.25rem_1fr] gap-x-4 pb-16 last:pb-0 md:grid-cols-[1fr_8rem_1fr] md:gap-x-0 md:pb-24">
-      <div className="col-start-1 row-start-1 flex justify-center md:col-start-2">
-        <span
-          ref={markerRef}
-          data-reached={arrived}
-          className="relative z-10 mt-2 block size-[18px] rounded-full border-[3px] border-mist bg-paper-2 transition-[background-color,border-color,box-shadow] duration-500 data-[reached=true]:border-ink data-[reached=true]:bg-ink data-[reached=true]:shadow-[0_0_0_5px_rgba(0,0,0,0.1)]"
-        />
-      </div>
-
-      {showYear && (
-        <div
-          aria-hidden
-          data-year={m.year}
-          className={cn(
-            "row-start-1 hidden font-serif text-[5rem] leading-[0.8] text-ink/[0.09] before:content-[attr(data-year)] md:block",
-            left ? "md:col-start-3 md:pl-10" : "md:col-start-1 md:pr-10 md:text-right"
-          )}
-        />
+    <li
+      className={cn(
+        "relative grid grid-cols-[2.75rem_minmax(0,1fr)] gap-x-5 md:grid-cols-[6rem_minmax(0,1fr)] md:gap-x-8",
+        !last && "pb-14 md:pb-16"
       )}
+    >
+      <div className="flex justify-center">
+        <span ref={markerRef} data-reached={arrived} className="medallion">
+          {m.logo && (
+            <img
+              src={m.logo.src}
+              alt=""
+              width={m.logo.width}
+              height={m.logo.height}
+              loading="lazy"
+              decoding="async"
+              className="h-auto max-h-[60%] w-auto max-w-[64%]"
+            />
+          )}
+        </span>
+      </div>
 
       <div
         data-arrived={arrived}
-        className={cn(
-          "col-start-2 row-start-1 min-w-0 transition-[opacity,transform] duration-700 ease-out-quint data-[arrived=false]:translate-y-4 data-[arrived=false]:opacity-0",
-          left ? "md:col-start-1 md:max-w-[31rem] md:justify-self-end md:pr-10" : "md:col-start-3 md:max-w-[31rem] md:pl-10"
-        )}
+        className="min-w-0 max-w-[42rem] pt-0.5 transition-[opacity,transform] duration-700 ease-out-quint data-[arrived=false]:translate-y-4 data-[arrived=false]:opacity-0 md:pt-2.5"
       >
-        <div className={cn(m.badge && "flex items-start gap-4")}>
-          {m.badge && (
-            <img
-              src={m.badge}
-              alt=""
-              width={72}
-              height={72}
-              loading="lazy"
-              decoding="async"
-              className="size-[72px] shrink-0"
-            />
-          )}
-          <div className="min-w-0">
-            <p className="text-sm font-medium text-ink-3">{m.period}</p>
-            <h3 className="t-h3 mt-1.5 text-ink">{m.title}</h3>
-            <p className="mt-1.5 text-ink-2">
-              {m.org}
-              {m.place && <span className="text-ink-3">, {m.place}</span>}
-            </p>
-          </div>
-        </div>
+        <p className="text-sm font-medium text-ink-3">{m.period}</p>
+        <h3 className="t-h3 mt-1.5 text-ink">{m.title}</h3>
+        <p className="mt-1.5 text-ink-2">
+          {m.org}
+          {m.place && <span className="text-ink-3">, {m.place}</span>}
+        </p>
 
         {m.summary && <p className="mt-4 text-ink-2">{m.summary}</p>}
 
@@ -339,7 +356,11 @@ function MilestoneItem({
                 className="link inline-flex items-center gap-1 text-ink"
               >
                 {link.label}
-                {link.external && <ArrowUpRight aria-hidden className="size-3.5" />}
+                {link.external ? (
+                  <ArrowUpRight aria-hidden className="size-3.5" />
+                ) : (
+                  <ArrowDown aria-hidden className="size-3.5" />
+                )}
               </a>
             ))}
           </div>
