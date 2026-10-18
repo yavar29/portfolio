@@ -13,10 +13,6 @@ export const RESUME = {
   filename: "Yavar_Khan_Resume.pdf",
 };
 
-// Cloudflare Turnstile
-export const TURNSTILE_SITE_KEY =
-  process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "0x4AAAAAACwCkDujsT-LvOqY";
-
 export const SOCIAL_LINKS = {
   github: "https://github.com/yavar29",
   linkedin: "https://www.linkedin.com/in/yavar-khan29/",

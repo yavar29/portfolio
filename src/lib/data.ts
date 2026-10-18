@@ -323,8 +323,9 @@ export const aerveil = {
         "GCP infrastructure defined in Terraform on a private VPC, with Secret Manager, least-privilege access, per-grower data isolation, keyless gated CI/CD and log-based alerts.",
     },
   ] satisfies AerveilItem[],
-  // Beyond engineering: the product change from design-partner feedback is set as the feature.
-  beyondHighlight: "Turned design-partner feedback into product changes, such as product-specific spray windows",
+  // Beyond engineering: the design-partner collaboration is set as the feature.
+  beyondHighlight:
+    "Collaborating closely with the design partner to refine the product, translating field feedback into shipped improvements",
   beyond: [
     "Built and run aerveil.ai",
     "Product demos and grower onboarding",

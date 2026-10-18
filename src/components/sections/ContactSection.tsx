@@ -1,40 +1,49 @@
 "use client";
 
-import { useEffect, useRef, useState, type FormEvent } from "react";
-import { AlertCircle, ArrowRight, Check, CheckCircle, Copy, Download, Loader2, MapPin } from "lucide-react";
+import { useEffect, useState, type CSSProperties } from "react";
+import { ArrowUpRight, Check, Copy, Download, FileText, Mail, MapPin } from "lucide-react";
 import { GitHubMark, LinkedInMark } from "@/components/ui/BrandIcons";
-import { cn } from "@/lib/utils";
-import { RESUME, SITE, SOCIAL_LINKS, TURNSTILE_SITE_KEY } from "@/lib/constants";
+import RevealList from "@/components/ui/RevealList";
+import { RESUME, SITE, SOCIAL_LINKS } from "@/lib/constants";
 
-declare global {
-  interface Window {
-    turnstile?: {
-      render: (container: string | HTMLElement, options: Record<string, unknown>) => string;
-      reset: (widgetId?: string) => void;
-    };
-  }
-}
+const order = (i: number) => ({ "--i": i * 1.5 }) as CSSProperties;
 
-type FormStatus = "idle" | "submitting" | "success" | "error";
+// "in/yavar-khan29" and "github.com/yavar29", read from the links so they can't drift apart.
+const handle = (url: string, withHost = false) => {
+  const { hostname, pathname } = new URL(url);
+  const path = pathname.replace(/^\/|\/$/g, "");
+  return withHost ? `${hostname}/${path}` : path;
+};
 
-const TOPICS = ["Hiring", "Collaboration", "Just saying hi"];
-const TURNSTILE_SRC = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+const pacificTime = new Intl.DateTimeFormat("en-US", {
+  timeZone: "America/Los_Angeles",
+  hour: "numeric",
+  minute: "2-digit",
+  timeZoneName: "short",
+});
 
-// Underlined fields: quieter than boxes inside the form panel, and the focus state is the line.
-const fieldClass =
-  "w-full border-b border-white/20 bg-transparent px-0 py-2 text-[0.9688rem] text-on-night outline-none transition-colors duration-200 placeholder:text-on-night-2/50 focus:border-white disabled:opacity-50";
-const labelClass = "text-[0.8125rem] font-medium text-on-night-2";
-const linkPill =
-  "inline-flex items-center gap-2.5 rounded-full border border-white/15 px-4 py-2.5 text-[0.9375rem] text-on-night transition-colors duration-200 hover:border-white/45";
+const primaryButton =
+  "inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-[0.9375rem] font-medium text-ink transition-colors duration-200 hover:bg-mist";
+const secondaryButton =
+  "inline-flex items-center gap-2 rounded-full border border-white/20 px-5 py-3 text-[0.9375rem] font-medium text-on-night transition-colors duration-200 hover:border-white/55";
 
+/*
+ * The closing bookend to the hero: where the hero sets the name across the page, this sets
+ * "Get in touch" the same way. The email address and its two actions sit under it, and the other
+ * ways to reach him run along the bottom in vine-row columns, with his local time so a reader
+ * knows when he'll reply.
+ */
 export default function ContactSection() {
-  const [topic, setTopic] = useState(TOPICS[0]);
-  const [status, setStatus] = useState<FormStatus>("idle");
-  const [errorMessage, setErrorMessage] = useState("");
-  const formRef = useRef<HTMLFormElement>(null);
-  const turnstileRef = useRef<HTMLDivElement>(null);
-  const widgetIdRef = useRef<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [time, setTime] = useState<string>();
+
+  // Local time renders only in the browser, so the static HTML never shows a stale clock.
+  useEffect(() => {
+    const tick = () => setTime(pacificTime.format(new Date()));
+    tick();
+    const id = window.setInterval(tick, 30_000);
+    return () => window.clearInterval(id);
+  }, []);
 
   async function copyEmail() {
     try {
@@ -42,240 +51,114 @@ export default function ContactSection() {
       setCopied(true);
       window.setTimeout(() => setCopied(false), 2000);
     } catch {
-      // Clipboard unavailable (insecure context or denied): the mailto link still works.
+      // Clipboard unavailable (insecure context or denied): the mailto links still work.
     }
   }
 
-  // Load the Turnstile script only when the form is about to scroll into view.
-  useEffect(() => {
-    const container = turnstileRef.current;
-    if (!container) return;
-
-    const render = () => {
-      if (!window.turnstile || widgetIdRef.current) return;
-      widgetIdRef.current = window.turnstile.render(container, {
-        sitekey: TURNSTILE_SITE_KEY,
-        theme: "dark",
-        size: "flexible",
-      });
-    };
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry.isIntersecting) return;
-        observer.disconnect();
-        if (window.turnstile) return render();
-        let script = document.querySelector<HTMLScriptElement>(`script[src="${TURNSTILE_SRC}"]`);
-        if (!script) {
-          script = document.createElement("script");
-          script.src = TURNSTILE_SRC;
-          script.async = true;
-          document.head.appendChild(script);
-        }
-        script.addEventListener("load", render, { once: true });
-      },
-      { rootMargin: "600px 0px" }
-    );
-    observer.observe(container);
-    return () => observer.disconnect();
-  }, []);
-
-  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setStatus("submitting");
-    setErrorMessage("");
-
-    const formData = new FormData(e.currentTarget);
-    if (!formData.get("cf-turnstile-response")) {
-      setStatus("error");
-      setErrorMessage("Complete the verification check, then send again.");
-      return;
-    }
-
-    const payload: Record<string, string> = {};
-    formData.forEach((value, key) => {
-      payload[key] = value.toString();
-    });
-
-    try {
-      const res = await fetch(`https://formsubmit.co/ajax/${SITE.email}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (res.ok) {
-        setStatus("success");
-        formRef.current?.reset();
-        setTopic(TOPICS[0]);
-      } else {
-        const data = await res.json().catch(() => null);
-        setStatus("error");
-        setErrorMessage(data?.message || "The message didn't go through. Try again, or email me directly.");
-      }
-    } catch {
-      setStatus("error");
-      setErrorMessage("No connection. Check your network and send again, or email me directly.");
-    }
-
-    if (widgetIdRef.current) window.turnstile?.reset(widgetIdRef.current);
-  }
-
-  const busy = status === "submitting";
+  const directory = [
+    {
+      label: "LinkedIn",
+      detail: handle(SOCIAL_LINKS.linkedin),
+      href: SOCIAL_LINKS.linkedin,
+      icon: <LinkedInMark className="size-[1.125rem]" />,
+    },
+    {
+      label: "GitHub",
+      detail: handle(SOCIAL_LINKS.github, true),
+      href: SOCIAL_LINKS.github,
+      icon: <GitHubMark className="size-[1.125rem]" />,
+    },
+    {
+      label: "Resume",
+      detail: "Download PDF",
+      href: RESUME.href,
+      download: RESUME.filename,
+      icon: <FileText aria-hidden className="size-[1.125rem] text-white" />,
+    },
+  ];
 
   return (
     <section
       id="contact"
       data-nav-theme="dark"
-      className="on-dark flex min-h-svh flex-col justify-center bg-night bg-[radial-gradient(circle,rgb(255_255_255/0.07)_1px,transparent_1.25px)] bg-[length:24px_24px] text-on-night"
+      className="on-dark flex min-h-svh flex-col bg-night bg-[radial-gradient(circle,rgb(255_255_255/0.07)_1px,transparent_1.25px)] bg-[length:24px_24px] text-on-night"
     >
-      <div className="container-page section-pad grid items-center gap-12 lg:grid-cols-12 lg:gap-16">
-        <div className="lg:col-span-7">
-          <h2 className="text-[clamp(3.25rem,2rem+5vw,6.5rem)] leading-[0.95] tracking-[-0.03em] text-white">
-            Get in touch
-          </h2>
-          <p className="t-lead mt-6 max-w-[34ch] text-on-night-2">
-            Email me directly, or send a message with the form.
-          </p>
+      <RevealList
+        as="div"
+        className="container-page flex flex-1 flex-col pb-10 pt-28 [container-type:inline-size] sm:pb-12 sm:pt-32 lg:pb-14 lg:pt-36"
+      >
+        {/* Sized like the hero name, so it spans the column: it measures 4.84em in Newsreader. */}
+        <h2 className="wipe -ml-[0.04em] font-serif text-[calc(100cqw/4.9)] leading-[0.9] tracking-[-0.04em] text-white">
+          Get in touch
+        </h2>
 
-          <div className="mt-10 flex flex-wrap items-center gap-x-4 gap-y-3">
-            <a
-              href={SOCIAL_LINKS.email}
-              className="link break-all font-serif text-[1.3125rem] leading-tight text-white sm:text-[2rem]"
-            >
-              {SITE.email}
+        <div
+          className="reveal-item my-auto flex flex-col gap-6 py-12 sm:py-14 lg:flex-row lg:items-center lg:justify-between"
+          style={order(2)}
+        >
+          <a
+            href={SOCIAL_LINKS.email}
+            className="email-link w-fit font-serif text-[clamp(1.5rem,1rem+2vw,2.75rem)] leading-tight tracking-[-0.01em] text-white"
+          >
+            {SITE.email}
+          </a>
+          <div className="flex flex-wrap gap-2.5 sm:gap-3">
+            <a href={SOCIAL_LINKS.email} className={primaryButton}>
+              <Mail aria-hidden className="size-4" />
+              Email me
             </a>
-            <button
-              type="button"
-              onClick={copyEmail}
-              aria-label={copied ? "Email address copied" : "Copy email address"}
-              className="inline-flex size-10 shrink-0 items-center justify-center rounded-full border border-white/15 text-on-night-2 transition-colors duration-200 hover:border-white/45 hover:text-white"
-            >
-              {copied ? <Check aria-hidden className="size-4 text-white" /> : <Copy aria-hidden className="size-4" />}
+            <button type="button" onClick={copyEmail} className={secondaryButton}>
+              {copied ? <Check aria-hidden className="size-4" /> : <Copy aria-hidden className="size-4" />}
+              {copied ? "Copied" : "Copy email"}
             </button>
             <span aria-live="polite" className="sr-only">
               {copied ? "Email address copied" : ""}
             </span>
           </div>
-
-          <div className="mt-8 flex flex-wrap gap-2.5">
-            <a href={SOCIAL_LINKS.linkedin} target="_blank" rel="noopener noreferrer" className={linkPill}>
-              <LinkedInMark className="size-[1.125rem]" />
-              LinkedIn
-            </a>
-            <a href={SOCIAL_LINKS.github} target="_blank" rel="noopener noreferrer" className={linkPill}>
-              <GitHubMark className="size-[1.125rem]" />
-              GitHub
-            </a>
-            <a
-              href={RESUME.href}
-              download={RESUME.filename}
-              className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2.5 text-[0.9375rem] font-medium text-ink transition-colors duration-200 hover:bg-mist"
-            >
-              <Download aria-hidden className="size-4" />
-              Download resume
-            </a>
-          </div>
-
-          <p className="mt-10 inline-flex items-center gap-2 text-sm text-on-night-2">
-            <MapPin aria-hidden className="size-4" />
-            {SITE.location}
-          </p>
         </div>
 
-        <form
-          ref={formRef}
-          onSubmit={handleSubmit}
-          className="rounded-[1.5rem] border border-white/10 bg-charcoal/80 p-5 sm:p-6 lg:col-span-5"
-          aria-describedby="contact-status"
-        >
-          <input type="hidden" name="_subject" value={`Portfolio contact: ${topic}`} />
-          <input type="hidden" name="_template" value="table" />
-          <input type="hidden" name="category" value={topic} />
-
-          <fieldset>
-            <legend className={labelClass}>What is this about?</legend>
-            <div className="mt-2.5 flex flex-wrap gap-1.5">
-              {TOPICS.map((t) => (
-                <label
-                  key={t}
-                  className={cn(
-                    "cursor-pointer rounded-full border px-3 py-1.5 text-[0.8125rem] transition-colors duration-200 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-on-night",
-                    topic === t
-                      ? "border-white bg-white text-ink"
-                      : "border-white/15 text-on-night-2 hover:border-white/40 hover:text-on-night"
-                  )}
-                >
-                  <input
-                    type="radio"
-                    name="topic"
-                    value={t}
-                    checked={topic === t}
-                    onChange={() => setTopic(t)}
-                    className="sr-only"
+        <ul className="grid gap-x-8 sm:grid-cols-2 lg:grid-cols-4 lg:gap-x-10">
+          {directory.map((item, i) => (
+            <li key={item.label} style={order(i + 3)} className="reveal-item vine-rule">
+              <a
+                href={item.href}
+                {...(item.download
+                  ? { download: item.download }
+                  : { target: "_blank", rel: "noopener noreferrer" })}
+                className="group flex items-start justify-between gap-4 py-5"
+              >
+                <span>
+                  <span className="flex items-center gap-2.5 text-[1.0625rem] font-medium text-white">
+                    {item.icon}
+                    {item.label}
+                  </span>
+                  <span className="mt-1.5 block text-on-night-2 transition-colors duration-200 group-hover:text-white">
+                    {item.detail}
+                  </span>
+                </span>
+                {item.download ? (
+                  <Download
+                    aria-hidden
+                    className="mt-1 size-4 shrink-0 text-on-night-2 transition-transform duration-200 group-hover:translate-y-0.5 group-hover:text-white"
                   />
-                  {t}
-                </label>
-              ))}
-            </div>
-          </fieldset>
-
-          <div className="mt-6 grid gap-5 sm:grid-cols-2 sm:gap-5">
-            <div>
-              <label htmlFor="name" className={labelClass}>
-                Name
-              </label>
-              <input id="name" name="name" type="text" required autoComplete="name" disabled={busy} className={fieldClass} />
-            </div>
-            <div>
-              <label htmlFor="email" className={labelClass}>
-                Email
-              </label>
-              <input id="email" name="email" type="email" required autoComplete="email" disabled={busy} className={fieldClass} />
-            </div>
-          </div>
-
-          <div className="mt-5">
-            <label htmlFor="message" className={labelClass}>
-              Message
-            </label>
-            <textarea id="message" name="message" required rows={3} disabled={busy} className={cn(fieldClass, "resize-y")} />
-          </div>
-
-          <div ref={turnstileRef} className="mt-5 min-h-[65px]" />
-
-          <button
-            type="submit"
-            disabled={busy}
-            className="group mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-[0.9375rem] font-medium text-ink transition-colors duration-200 hover:bg-mist disabled:opacity-60"
-          >
-            {busy ? (
-              <>
-                <Loader2 aria-hidden className="size-4 animate-spin" />
-                Sending…
-              </>
-            ) : (
-              <>
-                Send message
-                <ArrowRight aria-hidden className="size-4 transition-transform duration-200 group-hover:translate-x-0.5" />
-              </>
-            )}
-          </button>
-          <p id="contact-status" aria-live="polite" className="mt-3 text-sm empty:mt-0">
-            {status === "success" && (
-              <span className="inline-flex items-center gap-2 text-on-night">
-                <CheckCircle aria-hidden className="size-4 text-on-night" />
-                Message sent. I&apos;ll reply by email.
-              </span>
-            )}
-            {status === "error" && (
-              <span className="inline-flex items-center gap-2 text-[#f5b5c0]">
-                <AlertCircle aria-hidden className="size-4" />
-                {errorMessage}
-              </span>
-            )}
-          </p>
-        </form>
-      </div>
+                ) : (
+                  <ArrowUpRight
+                    aria-hidden
+                    className="mt-1 size-4 shrink-0 text-on-night-2 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-white"
+                  />
+                )}
+              </a>
+            </li>
+          ))}
+          <li style={order(6)} className="reveal-item vine-rule py-5">
+            <span className="flex items-center gap-2.5 text-[1.0625rem] font-medium text-white">
+              <MapPin aria-hidden className="size-[1.125rem]" />
+              {SITE.location}
+            </span>
+            <span className="mt-1.5 block min-h-[1.5em] text-on-night-2">{time}</span>
+          </li>
+        </ul>
+      </RevealList>
     </section>
   );
 }

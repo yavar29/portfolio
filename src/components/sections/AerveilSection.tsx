@@ -97,8 +97,8 @@ export default function AerveilSection() {
       </div>
 
       {/*
-        Beyond engineering: the product change that came from design-partner feedback is the
-        feature, set large on a charcoal panel; the rest of the work sits beside it as a list.
+        Beyond engineering: the design-partner collaboration is the feature, set large on a
+        charcoal panel; the rest of the work sits beside it as a list.
       */}
       <div className="container-page mt-20 sm:mt-24 lg:mt-28">
         <h3 className="t-h3 text-white">Beyond engineering</h3>
