@@ -390,7 +390,7 @@ export const featuredProjects: FeaturedProject[] = [
     stack: ["OpenAI Agents SDK", "Pydantic", "SQLite", "Gradio"],
     links: [
       { label: "GitHub", href: "https://github.com/yavar29/GenAI_Projects/tree/main/OpenAI_Agents_SDK/deep_research_pro" },
-      { label: "Demo video", href: "https://github.com/user-attachments/assets/e4bb495b-50b2-4314-aea6-31ef69b3d5ec" },
+      { label: "Demo video", href: "/video/deep-research-pro-demo.mp4" },
     ],
     flow: [
       [{ label: "Query planning, human-reviewed", core: true }],
@@ -460,12 +460,6 @@ export const earlierProjects: EarlierProject[] = [
     description: "1D CNN classifying five emotions from speech using MFCC features.",
     href: "https://github.com/yavar29/ML_Projects/tree/main/Deep%20Learning%20Models/Convolutional%20Neural%20Network/SpeechEmotionRecognition",
     linkLabel: "Code",
-  },
-  {
-    title: "GraphCast for Medium-Range Weather Prediction",
-    description: "Paper presentation and code demo for CSE 676 Deep Learning at the University at Buffalo.",
-    href: "/GraphCast_Presentation_YavarKhan.pdf",
-    linkLabel: "Slides (PDF)",
   },
 ];
 
