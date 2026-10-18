@@ -90,13 +90,15 @@ export default function HeroSection() {
       </div>
 
       {/*
-        Below 1280px the portrait follows the content. From xl it is taken out of flow,
-        centered on the bottom edge and as tall as the screen allows, so its head sits in
-        front of the name.
+        Phones have no hero portrait (About opens with one). From md it follows the content;
+        from xl it is taken out of flow, centered on the bottom edge and as tall as the screen
+        allows, so its head sits in front of the name.
       */}
-      <div className="mt-10 flex justify-center px-5 xl:absolute xl:inset-x-0 xl:bottom-0 xl:top-[calc(7rem+var(--name-size)*0.11)] xl:mt-0 xl:px-0">
+      <div className="mt-10 hidden justify-center px-5 md:flex xl:absolute xl:inset-x-0 xl:bottom-0 xl:top-[calc(7rem+var(--name-size)*0.11)] xl:mt-0 xl:px-0">
         <div className="rise xl:h-full" style={delay(80)}>
           <picture className="block xl:h-full">
+            {/* A 1px stand-in so phones never download the hidden portrait. */}
+            <source media="(max-width: 767px)" srcSet="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
             <source
               type="image/avif"
               srcSet="/images/yavar-hero-480.avif 480w, /images/yavar-hero-720.avif 720w, /images/yavar-hero-896.avif 896w"

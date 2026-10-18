@@ -10,8 +10,7 @@
   --color-mist: #d4d4d4;
   --color-night: #000000;
   --color-night-2: #141414;
-  --color-graphite: #101010;
-  --color-graphite-2: #181818;
+  --color-charcoal: #1f1f1f;
   --color-on-night: #fafafa;
   --color-on-night-2: #a3a3a3;
 
@@ -203,6 +202,16 @@
   [data-reveal="pending"] .reveal-item {
     opacity: 0;
     transform: translateY(18px);
+  }
+
+  /* About portrait: a curtain that opens upward the first time the panel scrolls into view. */
+  .curtain {
+    clip-path: inset(0 0 0 0);
+    transition: clip-path 1.3s var(--ease-out-quint);
+  }
+
+  [data-reveal="pending"] .curtain {
+    clip-path: inset(100% 0 0 0);
   }
 
   /* Disclosure panel: animates to and from its natural height. */
