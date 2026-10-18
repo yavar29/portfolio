@@ -30,7 +30,7 @@ export default function HeroSection() {
     <section
       id="top"
       data-nav-theme="dark"
-      className="hero on-dark relative flex min-h-[min(100svh,60rem)] flex-col overflow-hidden bg-night text-on-night"
+      className="hero on-dark relative flex min-h-svh flex-col overflow-hidden bg-night text-on-night"
     >
       <div className="container-page relative pt-24 sm:pt-28">
         <h1 className="hero-name rise -ml-[0.04em] text-white">Yavar Khan</h1>
@@ -117,7 +117,7 @@ export default function HeroSection() {
               height={1152}
               fetchPriority="high"
               decoding="async"
-              className="block h-auto w-full max-w-[20rem] md:max-w-[24rem] contrast-[1.06] grayscale xl:h-full xl:w-auto xl:max-w-none"
+              className="block h-auto w-full max-w-[20rem] md:max-w-[24rem] contrast-[1.06] grayscale xl:h-full xl:w-auto xl:max-w-[40rem] xl:object-contain xl:object-bottom"
             />
           </picture>
         </div>

@@ -28,7 +28,8 @@
   }
 
   body {
-    background-color: var(--color-paper);
+    /* Black like the hero and footer, so overscroll at either end never flashes white. */
+    background-color: var(--color-night);
     color: var(--color-ink);
     font-family: var(--font-sans);
     font-size: 1.0625rem;
@@ -378,16 +379,29 @@
  * hard cuts. SectionStack adds the sticky offsets and the dimming (--cover, 0 to 1).
  * Unlayered on purpose, so it wins over the position utilities on the sections.
  */
+.section-stack {
+  --sheet-overlap: 2rem;
+}
+
 .section-stack > * {
   position: relative;
   isolation: isolate;
 }
 
 .section-stack > * + * {
-  margin-top: -2rem;
-  border-top-left-radius: 2rem;
-  border-top-right-radius: 2rem;
+  margin-top: calc(var(--sheet-overlap) * -1);
+  border-top-left-radius: var(--sheet-overlap);
+  border-top-right-radius: var(--sheet-overlap);
   box-shadow: 0 -28px 56px -28px rgb(0 0 0 / 0.45);
+}
+
+/*
+ * Every sheet but the last is at least a full screen plus the overlap, so at rest the
+ * next sheet starts exactly at the bottom edge of the screen and never peeks in.
+ * lvh (the screen with mobile browser bars hidden) keeps that true when the bars collapse.
+ */
+.section-stack > *:not(:last-child) {
+  min-height: calc(100lvh + var(--sheet-overlap));
 }
 
 .section-stack[data-stack="on"] > * {
@@ -407,10 +421,8 @@
 }
 
 @media (max-width: 639px) {
-  .section-stack > * + * {
-    margin-top: -1.25rem;
-    border-top-left-radius: 1.25rem;
-    border-top-right-radius: 1.25rem;
+  .section-stack {
+    --sheet-overlap: 1.25rem;
   }
 }
 

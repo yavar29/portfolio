@@ -16,12 +16,16 @@ export default function SectionStack({ children }: { children: ReactNode }) {
     if (!root) return;
     const sheets = Array.from(root.children) as HTMLElement[];
 
-    // Tall sections pin once their bottom meets the viewport's bottom; short ones pin at the top.
+    // A sheet pins once the strip the next sheet overlaps has gone below the screen's bottom
+    // edge, so the next sheet only comes into view as it slides up. Sheets no taller than the
+    // screen (plus that strip) pin at the top.
     const layout = () => {
       const viewport = window.innerHeight;
-      for (const sheet of sheets) {
-        sheet.style.setProperty("--sheet-top", `${Math.min(0, viewport - sheet.offsetHeight)}px`);
-      }
+      sheets.forEach((sheet, i) => {
+        const next = sheets[i + 1];
+        const overlap = next ? -parseFloat(getComputedStyle(next).marginTop) || 0 : 0;
+        sheet.style.setProperty("--sheet-top", `${Math.min(0, viewport + overlap - sheet.offsetHeight)}px`);
+      });
     };
 
     let frame = 0;

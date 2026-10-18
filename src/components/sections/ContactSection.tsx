@@ -22,7 +22,7 @@ const TURNSTILE_SRC = "https://challenges.cloudflare.com/turnstile/v0/api.js?ren
 
 // Underlined fields: quieter than boxes inside the form panel, and the focus state is the line.
 const fieldClass =
-  "w-full border-b border-white/20 bg-transparent px-0 py-2.5 text-[1rem] text-on-night outline-none transition-colors duration-200 placeholder:text-on-night-2/50 focus:border-white disabled:opacity-50";
+  "w-full border-b border-white/20 bg-transparent px-0 py-2 text-[0.9688rem] text-on-night outline-none transition-colors duration-200 placeholder:text-on-night-2/50 focus:border-white disabled:opacity-50";
 const labelClass = "text-[0.8125rem] font-medium text-on-night-2";
 const linkPill =
   "inline-flex items-center gap-2.5 rounded-full border border-white/15 px-4 py-2.5 text-[0.9375rem] text-on-night transition-colors duration-200 hover:border-white/45";
@@ -128,8 +128,8 @@ export default function ContactSection() {
       data-nav-theme="dark"
       className="on-dark flex min-h-svh flex-col justify-center bg-night bg-[radial-gradient(circle,rgb(255_255_255/0.07)_1px,transparent_1.25px)] bg-[length:24px_24px] text-on-night"
     >
-      <div className="container-page section-pad grid items-center gap-14 lg:grid-cols-12 lg:gap-16">
-        <div className="lg:col-span-6">
+      <div className="container-page section-pad grid items-center gap-12 lg:grid-cols-12 lg:gap-16">
+        <div className="lg:col-span-7">
           <h2 className="text-[clamp(3.25rem,2rem+5vw,6.5rem)] leading-[0.95] tracking-[-0.03em] text-white">
             Get in touch
           </h2>
@@ -185,7 +185,7 @@ export default function ContactSection() {
         <form
           ref={formRef}
           onSubmit={handleSubmit}
-          className="rounded-[1.75rem] border border-white/10 bg-charcoal/80 p-6 sm:p-8 lg:col-span-6 lg:p-10"
+          className="rounded-[1.5rem] border border-white/10 bg-charcoal/80 p-5 sm:p-6 lg:col-span-5"
           aria-describedby="contact-status"
         >
           <input type="hidden" name="_subject" value={`Portfolio contact: ${topic}`} />
@@ -194,12 +194,12 @@ export default function ContactSection() {
 
           <fieldset>
             <legend className={labelClass}>What is this about?</legend>
-            <div className="mt-3 flex flex-wrap gap-2">
+            <div className="mt-2.5 flex flex-wrap gap-1.5">
               {TOPICS.map((t) => (
                 <label
                   key={t}
                   className={cn(
-                    "cursor-pointer rounded-full border px-4 py-2 text-sm transition-colors duration-200 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-on-night",
+                    "cursor-pointer rounded-full border px-3 py-1.5 text-[0.8125rem] transition-colors duration-200 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-on-night",
                     topic === t
                       ? "border-white bg-white text-ink"
                       : "border-white/15 text-on-night-2 hover:border-white/40 hover:text-on-night"
@@ -219,7 +219,7 @@ export default function ContactSection() {
             </div>
           </fieldset>
 
-          <div className="mt-8 grid gap-7 sm:grid-cols-2 sm:gap-6">
+          <div className="mt-6 grid gap-5 sm:grid-cols-2 sm:gap-5">
             <div>
               <label htmlFor="name" className={labelClass}>
                 Name
@@ -234,19 +234,19 @@ export default function ContactSection() {
             </div>
           </div>
 
-          <div className="mt-7">
+          <div className="mt-5">
             <label htmlFor="message" className={labelClass}>
               Message
             </label>
-            <textarea id="message" name="message" required rows={4} disabled={busy} className={cn(fieldClass, "resize-y")} />
+            <textarea id="message" name="message" required rows={3} disabled={busy} className={cn(fieldClass, "resize-y")} />
           </div>
 
-          <div ref={turnstileRef} className="mt-7 min-h-[65px]" />
+          <div ref={turnstileRef} className="mt-5 min-h-[65px]" />
 
           <button
             type="submit"
             disabled={busy}
-            className="group mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-6 py-3.5 text-[0.9375rem] font-medium text-ink transition-colors duration-200 hover:bg-mist disabled:opacity-60"
+            className="group mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-[0.9375rem] font-medium text-ink transition-colors duration-200 hover:bg-mist disabled:opacity-60"
           >
             {busy ? (
               <>
@@ -260,7 +260,7 @@ export default function ContactSection() {
               </>
             )}
           </button>
-          <p id="contact-status" aria-live="polite" className="mt-4 min-h-5 text-sm">
+          <p id="contact-status" aria-live="polite" className="mt-3 text-sm empty:mt-0">
             {status === "success" && (
               <span className="inline-flex items-center gap-2 text-on-night">
                 <CheckCircle aria-hidden className="size-4 text-on-night" />
