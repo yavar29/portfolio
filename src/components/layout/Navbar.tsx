@@ -5,9 +5,6 @@ import { Download, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NAV_ITEMS, RESUME } from "@/lib/constants";
 
-// The hero ("top") is observed too, so nothing is highlighted while it fills the viewport.
-const SECTION_IDS = ["top", ...NAV_ITEMS.map((item) => item.href.slice(1))];
-
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
@@ -15,36 +12,30 @@ export default function Navbar() {
   const [overDark, setOverDark] = useState(true);
 
   useEffect(() => {
-    // Dark sections opt in with data-nav-theme="dark"; the bar turns light-on-dark over them.
-    const darkSections = Array.from(document.querySelectorAll<HTMLElement>('[data-nav-theme="dark"]'));
-    const onScroll = () => {
+    // Sections overlap as stacked sheets, so ask the page which section is actually on top
+    // under the bar (for its light or dark style) and at the middle of the screen (for the
+    // active link). The hero has no nav item, so nothing is highlighted over it.
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const x = window.innerWidth / 2;
+      const underBar = document.elementFromPoint(x, 72)?.closest("section");
+      const inView = document.elementFromPoint(x, window.innerHeight * 0.47)?.closest("section");
       setScrolled(window.scrollY > 8);
-      setOverDark(
-        darkSections.some((el) => {
-          const { top, bottom } = el.getBoundingClientRect();
-          return top <= 32 && bottom > 32;
-        })
-      );
+      setOverDark(underBar?.dataset.navTheme === "dark");
+      setActive(inView?.id ?? "");
     };
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) setActive(entry.target.id);
-        }
-      },
-      { rootMargin: "-45% 0px -50% 0px" }
-    );
-    for (const id of SECTION_IDS) {
-      const el = document.getElementById(id);
-      if (el) observer.observe(el);
-    }
-    return () => observer.disconnect();
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+    };
   }, []);
 
   useEffect(() => {

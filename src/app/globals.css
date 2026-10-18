@@ -296,6 +296,48 @@
   }
 }
 
+/*
+ * Page sections as stacked sheets. Each sheet after the first rises 2rem over the one
+ * before it with rounded top corners, so section changes read as layers rather than
+ * hard cuts. SectionStack adds the sticky offsets and the dimming (--cover, 0 to 1).
+ * Unlayered on purpose, so it wins over the position utilities on the sections.
+ */
+.section-stack > * {
+  position: relative;
+  isolation: isolate;
+}
+
+.section-stack > * + * {
+  margin-top: -2rem;
+  border-top-left-radius: 2rem;
+  border-top-right-radius: 2rem;
+  box-shadow: 0 -28px 56px -28px rgb(0 0 0 / 0.45);
+}
+
+.section-stack[data-stack="on"] > * {
+  position: sticky;
+  top: var(--sheet-top, 0px);
+}
+
+.section-stack > *::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  border-radius: inherit;
+  background: #000;
+  opacity: calc(var(--cover, 0) * 0.5);
+  pointer-events: none;
+}
+
+@media (max-width: 639px) {
+  .section-stack > * + * {
+    margin-top: -1.25rem;
+    border-top-left-radius: 1.25rem;
+    border-top-right-radius: 1.25rem;
+  }
+}
+
 /* Starts at 0.01 rather than 0 so the hero still counts as painted for Largest Contentful Paint. */
 @keyframes rise {
   from {

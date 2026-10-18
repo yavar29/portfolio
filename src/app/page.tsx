@@ -1,3 +1,4 @@
+import SectionStack from "@/components/layout/SectionStack";
 import HeroSection from "@/components/sections/HeroSection";
 import AboutSection from "@/components/sections/AboutSection";
 import JourneySection from "@/components/sections/JourneySection";
@@ -9,7 +10,7 @@ import ContactSection from "@/components/sections/ContactSection";
 
 export default function Home() {
   return (
-    <>
+    <SectionStack>
       <HeroSection />
       <AboutSection />
       <JourneySection />
@@ -18,6 +19,6 @@ export default function Home() {
       <SkillsSection />
       <CertificationsSection />
       <ContactSection />
-    </>
+    </SectionStack>
   );
 }
