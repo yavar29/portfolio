@@ -12,6 +12,27 @@ export function GitHubMark({ className }: { className?: string }) {
   );
 }
 
+// The app-icon form: Instagram's gradient square with the white camera outline.
+export function InstagramMark({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden className={className}>
+      <defs>
+        <radialGradient id="instagram-gradient" cx="0.3" cy="1.07" r="1.15">
+          <stop offset="0" stopColor="#fdf497" />
+          <stop offset="0.05" stopColor="#fdf497" />
+          <stop offset="0.45" stopColor="#fd5949" />
+          <stop offset="0.6" stopColor="#d6249f" />
+          <stop offset="0.9" stopColor="#285aeb" />
+        </radialGradient>
+      </defs>
+      <rect x="0" y="0" width="24" height="24" rx="6.5" fill="url(#instagram-gradient)" />
+      <rect x="5" y="5" width="14" height="14" rx="4.25" fill="none" stroke="#fff" strokeWidth="1.7" />
+      <circle cx="12" cy="12" r="3.3" fill="none" stroke="#fff" strokeWidth="1.7" />
+      <circle cx="16.1" cy="7.9" r="1.05" fill="#fff" />
+    </svg>
+  );
+}
+
 export function LinkedInMark({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" aria-hidden className={className}>

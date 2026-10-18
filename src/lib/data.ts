@@ -282,6 +282,75 @@ export const milestones: Milestone[] = [
   },
 ];
 
+// ─── Aerveil ───────────────────────────────────────────────────────────────
+
+export interface AerveilItem {
+  title: string;
+  detail: string;
+}
+
+export const aerveil = {
+  name: "Aerveil",
+  role: "Founding AI Engineer",
+  period: "Mar 2026 – Present",
+  tagline:
+    "Frost and spray decisions for vineyards, block by block, delivered on WhatsApp with the reasoning behind every call.",
+  roleLine: "First and only engineer, owning the platform from design to deployment.",
+  links: {
+    site: "https://aerveil.ai/",
+    linkedin: "https://www.linkedin.com/company/aerveil-ai/",
+    instagram: "https://www.instagram.com/aerveil.ai/",
+  },
+  work: [
+    {
+      title: "Data ingestion pipelines",
+      detail:
+        "Live weather forecasts and observations matched to every vineyard block, with fallbacks when a source runs late",
+    },
+    {
+      title: "LLM agents & tool use",
+      detail:
+        "A WhatsApp assistant that answers growers from their own data and records changes only when the grower confirms",
+    },
+    {
+      title: "Evals & reliable AI",
+      detail:
+        "Rules make every decision and the LLM explains it, and evals check those explanations before anything ships",
+    },
+    {
+      title: "Cloud & delivery",
+      detail: "GCP managed as code, with keyless, gated CI/CD from commit to production",
+    },
+  ] satisfies AerveilItem[],
+  practicesTitle: "How I build: Claude-native engineering",
+  practicesIntro:
+    "I run the codebase as a Claude-native system: the code captures its own decisions and lessons, so every change starts from what's already been learned.",
+  practices: [
+    {
+      title: "Architecture decision records",
+      detail: "every major decision is documented and linked to the code it governs.",
+    },
+    {
+      title: "Scoped agent rules",
+      detail: "coding conventions load automatically for each part of the codebase.",
+    },
+    {
+      title: "Hooks and gates",
+      detail: "type checks on every edit; tests and eval gates before every commit and merge.",
+    },
+    { title: "Drift checks", detail: "CI flags any decision whose code changed without review." },
+    { title: "Human sign-off", detail: "safety-critical changes need explicit approval." },
+  ] satisfies AerveilItem[],
+  beyond: [
+    "Built and run aerveil.ai",
+    "Product demos and grower onboarding",
+    "On-site vineyard visits",
+    "Marketing and launch content",
+    "Turned design-partner feedback into product changes, such as product-specific spray windows",
+  ],
+  status: "Testing with our first design partner ahead of the season.",
+};
+
 // ─── Projects ──────────────────────────────────────────────────────────────
 
 export interface ProjectLink {
