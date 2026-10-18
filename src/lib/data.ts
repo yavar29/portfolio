@@ -47,17 +47,30 @@ export interface ProfileHighlight {
   label: string;
   title: string;
   detail: string;
+  // White vector mark; `size` is a Tailwind height class tuned so the marks carry equal visual weight.
+  logo: { src: string; width: number; height: number; size: string };
 }
 
 // The fourth highlight is the Professional certification, rendered from `professionalCert`.
 export const profileHighlights: ProfileHighlight[] = [
-  { label: "Now", title: "AI Engineer, Aerveil", detail: "End-to-end decision engines for vineyards" },
+  {
+    label: "Now",
+    title: "AI Engineer, Aerveil",
+    detail: "End-to-end decision engines for vineyards",
+    logo: { src: "/logos/aerveil.svg", width: 3548, height: 3622, size: "h-9" },
+  },
   {
     label: "Experience",
     title: "Nearly 3 years, Accenture",
     detail: "Mission-critical, enterprise-scale APIs for a Fortune 500 pharma client",
+    logo: { src: "/logos/accenture.svg", width: 2001, height: 2122, size: "h-7" },
   },
-  { label: "Education", title: "M.S. Computer Science, SUNY Buffalo", detail: "AI/ML track · 3.87 GPA" },
+  {
+    label: "Education",
+    title: "M.S. Computer Science, SUNY Buffalo",
+    detail: "AI/ML track · 3.87 GPA",
+    logo: { src: "/logos/ub.svg", width: 3200, height: 1648, size: "h-7" },
+  },
 ];
 
 // ─── Journey ───────────────────────────────────────────────────────────────

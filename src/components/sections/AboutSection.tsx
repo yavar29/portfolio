@@ -1,8 +1,9 @@
-/* eslint-disable @next/next/no-img-element -- static export ships a pre-optimized WebP badge */
+/* eslint-disable @next/next/no-img-element -- static export ships pre-built SVG logos and a WebP badge */
 import type { CSSProperties } from "react";
 import RevealList from "@/components/ui/RevealList";
 import AboutPortrait from "./AboutPortrait";
 import { aboutIntro, professionalCert, profileHighlights } from "@/lib/data";
+import { cn } from "@/lib/utils";
 
 const order = (i: number) => ({ "--i": i }) as CSSProperties;
 
@@ -48,7 +49,18 @@ export default function AboutSection() {
           <RevealList className="mt-12 grid gap-x-10 sm:grid-cols-2 lg:mt-14">
             {profileHighlights.map((highlight, i) => (
               <li key={highlight.label} className={item} style={order(i)}>
-                <p className={labelRow}>{highlight.label}</p>
+                <p className={labelRow}>
+                  {highlight.label}
+                  <img
+                    src={highlight.logo.src}
+                    alt=""
+                    width={highlight.logo.width}
+                    height={highlight.logo.height}
+                    loading="lazy"
+                    decoding="async"
+                    className={cn("-mt-1 w-auto", highlight.logo.size)}
+                  />
+                </p>
                 <p className={titleText}>{highlight.title}</p>
                 <p className={detailText}>{highlight.detail}</p>
               </li>
