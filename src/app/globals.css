@@ -412,59 +412,6 @@
     clip-path: inset(0 100% 0 0);
   }
 
-  /*
-   * Claude-native practices: stops along one vine row. Down the left edge on phones, across
-   * the page from md, running from the first stop to the last.
-   */
-  .practice-row {
-    position: relative;
-  }
-
-  .practice-row::before {
-    content: "";
-    position: absolute;
-    top: 1.4rem;
-    bottom: 1.4rem;
-    left: 3px;
-    width: 3px;
-    background: radial-gradient(circle, rgb(255 255 255 / 0.34) 1px, transparent 1.25px) 50% 0 / 3px 9px repeat-y;
-    clip-path: inset(0 0 0 0);
-    transition: clip-path 1.4s var(--ease-out-quint);
-  }
-
-  .practice-row[data-reveal="pending"]::before {
-    clip-path: inset(0 0 100% 0);
-  }
-
-  @media (min-width: 768px) {
-    /* Half a column in from each side (five columns, four 1rem gaps): first stop to last. */
-    .practice-row::before {
-      top: 3px;
-      bottom: auto;
-      left: calc((100% - 4rem) / 10);
-      right: calc((100% - 4rem) / 10);
-      width: auto;
-      height: 3px;
-      background: radial-gradient(circle, rgb(255 255 255 / 0.34) 1px, transparent 1.25px) 0 50% / 9px 3px repeat-x;
-    }
-
-    .practice-row[data-reveal="pending"]::before {
-      clip-path: inset(0 100% 0 0);
-    }
-  }
-
-  /* A stop on the row: a white vine with a ring of the background, so the dots part around it. */
-  .practice-node {
-    position: relative;
-    z-index: 1;
-    flex: none;
-    width: 9px;
-    height: 9px;
-    border-radius: 9999px;
-    background: var(--color-on-night);
-    box-shadow: 0 0 0 5px var(--color-night);
-  }
-
   /* Aerveil status: a small dot in the brand's amber with a slow ping, read as "live now". */
   .status-dot {
     position: relative;

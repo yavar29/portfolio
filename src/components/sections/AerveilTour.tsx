@@ -328,11 +328,12 @@ export default function AerveilTour({ status }: { status: string }) {
         {/*
           On phones the tour is drawn 21% larger and only its outer black is cropped: across the
           whole tour the devices stay between 15.5% and 93% of the width, so the crop is centered
-          on them and keeps a 3% margin.
+          on them and keeps a 3% margin. On larger screens it is capped by the screen's height,
+          so the tour and its play control below fit on one screen together.
         */}
         <div
           ref={screenRef}
-          className="tour-screen relative aspect-[1.469] origin-bottom overflow-hidden will-change-transform sm:aspect-video sm:overflow-visible"
+          className="tour-screen relative mx-auto aspect-[1.469] origin-bottom overflow-hidden will-change-transform sm:aspect-video sm:max-w-[calc((100svh_-_14rem)*16/9)] sm:overflow-visible"
         >
           <picture>
             {/* Held still for reduced motion, so it shows the tour mid-way rather than its opening. */}

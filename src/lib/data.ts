@@ -291,7 +291,7 @@ export interface AerveilItem {
 
 export const aerveil = {
   name: "Aerveil",
-  role: "Founding AI Engineer",
+  role: "AI Engineer",
   period: "Mar 2026 – Present",
   tagline:
     "Frost and spray decisions for vineyards, block by block, delivered on WhatsApp with the reasoning behind every call.",
@@ -305,39 +305,31 @@ export const aerveil = {
     {
       title: "Data ingestion pipelines",
       detail:
-        "Live weather forecasts and observations matched to every vineyard block, with fallbacks when a source runs late",
+        "Hourly, high-resolution NOAA forecasts and observations mapped to every vineyard block through fault-tolerant pipelines with source fallbacks and resumable backfills.",
     },
     {
       title: "LLM agents & tool use",
       detail:
-        "A WhatsApp assistant that answers growers from their own data and records changes only when the grower confirms",
+        "A WhatsApp agent with 20 typed, read-only tools over each grower's records and past decisions, keeping session context, grounding every answer, and writing only on explicit confirmation.",
     },
     {
       title: "Evals & reliable AI",
       detail:
-        "Rules make every decision and the LLM explains it, and evals check those explanations before anything ships",
+        "Every change ships with evals and every new failure becomes a regression test, enforced by LLM-as-judge gates in CI and full tracing of tool calls for debugging.",
     },
     {
       title: "Cloud & delivery",
-      detail: "GCP managed as code, with keyless, gated CI/CD from commit to production",
+      detail:
+        "GCP infrastructure defined in Terraform on a private VPC, with Secret Manager, least-privilege access, per-grower data isolation, keyless gated CI/CD and log-based alerts.",
     },
   ] satisfies AerveilItem[],
-  practicesTitle: "How I build: Claude-native engineering",
-  practicesIntro:
-    "I run the codebase as a Claude-native system: the code captures its own decisions and lessons, so every change starts from what's already been learned.",
-  practices: [
-    "Architecture decision records",
-    "Scoped agent rules",
-    "Hooks and gates",
-    "Drift checks",
-    "Human sign-off",
-  ],
+  // Beyond engineering: the product change from design-partner feedback is set as the feature.
+  beyondHighlight: "Turned design-partner feedback into product changes, such as product-specific spray windows",
   beyond: [
     "Built and run aerveil.ai",
     "Product demos and grower onboarding",
     "On-site vineyard visits",
     "Marketing and launch content",
-    "Turned design-partner feedback into product changes, such as product-specific spray windows",
   ],
   status: "Testing with our first design partner ahead of the season.",
 };
