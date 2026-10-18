@@ -12,14 +12,19 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState("");
-  const [overHero, setOverHero] = useState(true);
+  const [overDark, setOverDark] = useState(true);
 
   useEffect(() => {
-    const hero = document.getElementById("top");
+    // Dark sections opt in with data-nav-theme="dark"; the bar turns light-on-dark over them.
+    const darkSections = Array.from(document.querySelectorAll<HTMLElement>('[data-nav-theme="dark"]'));
     const onScroll = () => {
       setScrolled(window.scrollY > 8);
-      // The hero is dark, so the bar switches to light text while it sits over it.
-      setOverHero(!!hero && hero.getBoundingClientRect().bottom > 32);
+      setOverDark(
+        darkSections.some((el) => {
+          const { top, bottom } = el.getBoundingClientRect();
+          return top <= 32 && bottom > 32;
+        })
+      );
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -49,7 +54,7 @@ export default function Navbar() {
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
-  const dark = overHero && !open;
+  const dark = overDark && !open;
 
   return (
     <header
@@ -81,8 +86,13 @@ export default function Navbar() {
                   aria-current={isActive ? "true" : undefined}
                   className={cn(
                     "text-[0.9375rem] transition-colors duration-200",
-                    dark ? "text-on-night-2 hover:text-white" : "hover:text-ink",
-                    !dark && (isActive ? "text-ink" : "text-ink-3")
+                    dark
+                      ? isActive
+                        ? "text-white"
+                        : "text-on-night-2 hover:text-white"
+                      : isActive
+                        ? "text-ink"
+                        : "text-ink-3 hover:text-ink"
                   )}
                 >
                   {item.label}

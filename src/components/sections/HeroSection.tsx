@@ -28,6 +28,7 @@ export default function HeroSection() {
   return (
     <section
       id="top"
+      data-nav-theme="dark"
       className="hero on-dark relative flex min-h-[min(100svh,60rem)] flex-col overflow-hidden bg-night text-on-night"
     >
       <div className="container-page relative pt-24 sm:pt-28">

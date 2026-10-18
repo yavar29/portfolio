@@ -38,33 +38,26 @@ export const certifications: Certification[] = [
 
 export const [professionalCert, foundationsCert] = certifications;
 
-// ─── About: current focus ──────────────────────────────────────────────────
+// ─── About ─────────────────────────────────────────────────────────────────
 
-export interface FocusArea {
+export const aboutIntro =
+  "AI engineer building end-to-end, high-stakes decision systems, with a background in mission-critical enterprise software.";
+
+export interface ProfileHighlight {
+  label: string;
   title: string;
-  description: string;
-  tools: string[];
+  detail: string;
 }
 
-export const focusAreas: FocusArea[] = [
+// The fourth highlight is the Professional certification, rendered from `professionalCert`.
+export const profileHighlights: ProfileHighlight[] = [
+  { label: "Now", title: "AI Engineer, Aerveil", detail: "End-to-end decision engines for vineyards" },
   {
-    title: "LLM agents and tool use",
-    description:
-      "Agents on the Claude API and the OpenAI Agents SDK that answer from tenant-isolated tool calls, with MCP integrations and multi-agent orchestration.",
-    tools: ["Claude API", "OpenAI Agents SDK", "LangGraph", "MCP"],
+    label: "Experience",
+    title: "Nearly 3 years, Accenture",
+    detail: "Mission-critical, enterprise-scale APIs for a Fortune 500 pharma client",
   },
-  {
-    title: "Evals and reliable AI systems",
-    description:
-      "Deterministic decision logic with grounded LLM narration, LLM-as-judge eval gates in CI, tracing and prompt caching.",
-    tools: ["LangSmith", "Pydantic", "GitHub Actions", "RAG"],
-  },
-  {
-    title: "Data pipelines and cloud infrastructure",
-    description:
-      "Weather ingestion pipelines, auditable partitioned Postgres/PostGIS decision history and Terraform-managed deployments.",
-    tools: ["PostgreSQL/PostGIS", "Pinecone", "GCP", "AWS", "Terraform", "Docker"],
-  },
+  { label: "Education", title: "M.S. Computer Science, SUNY Buffalo", detail: "AI/ML track · 3.87 GPA" },
 ];
 
 // ─── Journey ───────────────────────────────────────────────────────────────

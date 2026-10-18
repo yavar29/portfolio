@@ -11,7 +11,7 @@ function Placeholder({ children, className }: { children: React.ReactNode; class
 
 export default function AerveilSection() {
   return (
-    <section id="aerveil" className="on-dark section-pad bg-night text-on-night">
+    <section id="aerveil" data-nav-theme="dark" className="on-dark section-pad bg-night text-on-night">
       <div className="container-page">
         <div className="flex flex-col gap-3 border-b border-white/10 pb-8 sm:flex-row sm:items-end sm:justify-between">
           <h2 className="t-h2">Aerveil</h2>

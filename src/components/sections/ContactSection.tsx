@@ -107,7 +107,7 @@ export default function ContactSection() {
   const busy = status === "submitting";
 
   return (
-    <section id="contact" className="on-dark bg-night text-on-night">
+    <section id="contact" data-nav-theme="dark" className="on-dark bg-night text-on-night">
       <div className="container-page section-pad grid gap-14 lg:grid-cols-12 lg:gap-12">
         <div className="lg:col-span-5">
           <h2 className="t-h2">Get in touch</h2>
