@@ -26,7 +26,7 @@ export default function AboutSection() {
     <section
       id="about"
       data-nav-theme="dark"
-      className="on-dark relative overflow-hidden border-t border-white/10 bg-charcoal text-on-night"
+      className="on-dark relative overflow-hidden border-t border-white/10 bg-charcoal bg-[radial-gradient(circle,rgb(255_255_255/0.075)_1px,transparent_1.25px)] bg-[length:24px_24px] text-on-night"
     >
       <div className="container-page grid lg:grid-cols-12 lg:gap-x-12">
         {/* On tablets the panel follows the text so it is not stacked right under the hero portrait. */}

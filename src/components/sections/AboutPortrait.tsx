@@ -12,39 +12,40 @@ import {
 import { cn } from "@/lib/utils";
 
 const SIZES = "(min-width: 1024px) 640px, (min-width: 640px) 420px, 340px";
-const TILT_SPRING = { stiffness: 120, damping: 16, mass: 0.6 };
+const HOVER_SPRING = { stiffness: 140, damping: 20, mass: 0.7 };
+const LIFT_SPRING = { stiffness: 90, damping: 24, mass: 0.6 };
 
 /**
  * Black panel holding the black-and-white portrait. The portrait stands on the section's
  * bottom edge and breaks past the panel's right edge on wide screens. It opens with a
- * curtain the first time the panel scrolls into view, rises gently with the scroll, and
- * on desktop leans a few degrees toward the cursor, pivoting on its bottom edge.
+ * curtain the first time the panel scrolls into view and rises gently with the scroll. On
+ * desktop, hovering makes it step forward (a small scale from its feet) and drift toward
+ * the cursor. No rotation, so the cut-out never skews and its bottom edge stays planted.
  */
 export default function AboutPortrait({ className }: { className?: string }) {
   const stageRef = useRef<HTMLDivElement>(null);
   const liftRef = useRef<HTMLDivElement>(null);
-  const tiltRef = useRef<HTMLDivElement>(null);
+  const stepRef = useRef<HTMLDivElement>(null);
   const reduceMotion = useReducedMotion();
 
   // Scroll: 0 when the panel's top meets the bottom of the viewport, 1 when it reaches the top.
   const { scrollYProgress } = useScroll({ target: stageRef, offset: ["start end", "start start"] });
-  const lift = useTransform(scrollYProgress, [0, 1], [72, 0]);
+  const lift = useSpring(useTransform(scrollYProgress, [0, 1], [48, 0]), LIFT_SPRING);
 
-  // Pointer position over the panel, -0.5 to 0.5 on each axis, smoothed by springs.
+  // Hover: whether the pointer is over the panel, and where across it (-0.5 to 0.5).
+  const hovering = useMotionValue(0);
   const pointerX = useMotionValue(0);
-  const pointerY = useMotionValue(0);
-  const smoothX = useSpring(pointerX, TILT_SPRING);
-  const smoothY = useSpring(pointerY, TILT_SPRING);
-  const tilt = useTransform(
-    () =>
-      `perspective(1200px) rotateY(${smoothX.get() * 7}deg) rotateX(${smoothY.get() * -4}deg) translate3d(${smoothX.get() * 14}px, 0, 0)`
+  const smoothHover = useSpring(hovering, HOVER_SPRING);
+  const smoothX = useSpring(pointerX, HOVER_SPRING);
+  const step = useTransform(
+    () => `translate3d(${smoothX.get() * 16}px, 0, 0) scale(${1 + smoothHover.get() * 0.03})`
   );
 
   useMotionValueEvent(lift, "change", (y) => {
     if (liftRef.current && !reduceMotion) liftRef.current.style.transform = `translate3d(0, ${y}px, 0)`;
   });
-  useMotionValueEvent(tilt, "change", (transform) => {
-    if (tiltRef.current) tiltRef.current.style.transform = transform;
+  useMotionValueEvent(step, "change", (transform) => {
+    if (stepRef.current) stepRef.current.style.transform = transform;
   });
 
   // Curtain reveal, only when the panel starts below the fold.
@@ -66,19 +67,19 @@ export default function AboutPortrait({ className }: { className?: string }) {
     return () => observer.disconnect();
   }, [reduceMotion, lift]);
 
-  // Hover tilt, for mouse and trackpad only.
+  // Hover step, for mouse and trackpad only.
   useEffect(() => {
     const stage = stageRef.current;
     if (!stage || reduceMotion || !window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
 
     const onMove = (e: PointerEvent) => {
       const rect = stage.getBoundingClientRect();
+      hovering.set(1);
       pointerX.set((e.clientX - rect.left) / rect.width - 0.5);
-      pointerY.set((e.clientY - rect.top) / rect.height - 0.5);
     };
     const onLeave = () => {
+      hovering.set(0);
       pointerX.set(0);
-      pointerY.set(0);
     };
     stage.addEventListener("pointermove", onMove);
     stage.addEventListener("pointerleave", onLeave);
@@ -86,16 +87,19 @@ export default function AboutPortrait({ className }: { className?: string }) {
       stage.removeEventListener("pointermove", onMove);
       stage.removeEventListener("pointerleave", onLeave);
     };
-  }, [reduceMotion, pointerX, pointerY]);
+  }, [reduceMotion, hovering, pointerX]);
 
   return (
     <div ref={stageRef} className={cn("relative", className)}>
-      <div aria-hidden className="absolute inset-y-0 -left-[100vw] -right-[100vw] bg-night lg:right-0" />
+      <div
+        aria-hidden
+        className="absolute inset-y-0 -left-[100vw] -right-[100vw] bg-night bg-[radial-gradient(circle,rgb(255_255_255/0.06)_1px,transparent_1.25px)] bg-[length:24px_24px] lg:right-0"
+      />
       <div
         ref={liftRef}
         className="absolute bottom-0 left-1/2 h-[92%] w-max -translate-x-1/2 lg:left-auto lg:-right-[30%] lg:h-[84%] lg:translate-x-0"
       >
-        <div ref={tiltRef} className="h-full origin-bottom will-change-transform">
+        <div ref={stepRef} className="h-full origin-bottom">
           <picture className="curtain block h-full">
             <source
               type="image/avif"
