@@ -47,7 +47,7 @@ export interface ProfileHighlight {
   label: string;
   title: string;
   detail: string;
-  // White vector mark; `size` is a Tailwind height class tuned so the marks carry equal visual weight.
+  // Brand-color vector mark; `size` is a Tailwind height class tuned so the marks carry equal visual weight.
   logo: { src: string; width: number; height: number; size: string };
 }
 
