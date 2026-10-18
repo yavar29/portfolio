@@ -295,7 +295,7 @@ export const aerveil = {
   period: "Mar 2026 – Present",
   tagline:
     "Frost and spray decisions for vineyards, block by block, delivered on WhatsApp with the reasoning behind every call.",
-  roleLine: "First and only engineer, owning the platform from design to deployment.",
+  roleLine: "First AI engineer, owning the platform from design to deployment.",
   links: {
     site: "https://aerveil.ai/",
     linkedin: "https://www.linkedin.com/company/aerveil-ai/",
@@ -326,21 +326,12 @@ export const aerveil = {
   practicesIntro:
     "I run the codebase as a Claude-native system: the code captures its own decisions and lessons, so every change starts from what's already been learned.",
   practices: [
-    {
-      title: "Architecture decision records",
-      detail: "every major decision is documented and linked to the code it governs.",
-    },
-    {
-      title: "Scoped agent rules",
-      detail: "coding conventions load automatically for each part of the codebase.",
-    },
-    {
-      title: "Hooks and gates",
-      detail: "type checks on every edit; tests and eval gates before every commit and merge.",
-    },
-    { title: "Drift checks", detail: "CI flags any decision whose code changed without review." },
-    { title: "Human sign-off", detail: "safety-critical changes need explicit approval." },
-  ] satisfies AerveilItem[],
+    "Architecture decision records",
+    "Scoped agent rules",
+    "Hooks and gates",
+    "Drift checks",
+    "Human sign-off",
+  ],
   beyond: [
     "Built and run aerveil.ai",
     "Product demos and grower onboarding",

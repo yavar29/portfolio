@@ -48,7 +48,7 @@ export default function AerveilSection() {
         <p className="mt-8 max-w-[38ch] text-balance font-serif text-[clamp(1.4375rem,1rem+1.25vw,2rem)] leading-[1.24] text-white sm:mt-10">
           {aerveil.tagline}
         </p>
-        <p className="mt-5 max-w-[44ch] text-balance text-on-night-2 sm:text-[1.0625rem]">{aerveil.roleLine}</p>
+        <p className="mt-5 max-w-[44ch] text-balance text-on-night-2 sm:max-w-[70ch] sm:text-[1.0625rem]">{aerveil.roleLine}</p>
         <div className="mt-8 flex flex-wrap items-center justify-center gap-2 sm:gap-3">
           <a href={aerveil.links.site} target="_blank" rel="noopener noreferrer" className={primaryButton}>
             aerveil.ai
@@ -94,31 +94,39 @@ export default function AerveilSection() {
         </RevealList>
       </div>
 
-      <div className="container-page mt-20 grid gap-8 sm:mt-24 lg:mt-32 lg:grid-cols-12 lg:gap-16">
-        <div className="lg:col-span-5">
-          <div className="lg:sticky lg:top-28">
-            <h3 className="t-h3 max-w-[20ch] text-balance text-white">{keepHyphens(aerveil.practicesTitle)}</h3>
-            <p className="mt-6 max-w-[34ch] font-serif text-[1.375rem] leading-[1.42] text-mist sm:text-[1.5625rem]">
-              {keepHyphens(aerveil.practicesIntro)}
-            </p>
-          </div>
+      {/* The practices are stops along one vine row: a line of dots that plants itself left to right. */}
+      <div className="container-page mt-20 sm:mt-24 lg:mt-32">
+        <div className="grid gap-5 lg:grid-cols-12 lg:gap-16">
+          <h3 className="t-h3 max-w-[20ch] text-balance text-white lg:col-span-5">
+            {keepHyphens(aerveil.practicesTitle)}
+          </h3>
+          <p className="max-w-[54ch] text-pretty leading-relaxed text-on-night-2 sm:text-[1.0625rem] lg:col-span-7 lg:pt-1.5">
+            {keepHyphens(aerveil.practicesIntro)}
+          </p>
         </div>
-        <ul className="vine-rule-end lg:col-span-7">
-          {aerveil.practices.map((practice) => (
-            <li key={practice.title} className="vine-rule py-6 text-[1.0625rem] leading-relaxed">
-              <span className="font-medium text-white">{practice.title}:</span>{" "}
-              <span className="text-on-night-2">{practice.detail}</span>
+        <RevealList className="practice-row mt-9 grid md:mt-14 md:grid-cols-5 md:gap-x-4">
+          {aerveil.practices.map((practice, i) => (
+            <li
+              key={practice}
+              style={order(i)}
+              className="reveal-item flex items-center gap-5 py-2.5 md:flex-col md:gap-5 md:py-0 md:text-center"
+            >
+              <span aria-hidden className="practice-node" />
+              <span className="text-[1.0625rem] leading-snug text-white md:max-w-[13ch] md:text-balance">
+                {practice}
+              </span>
             </li>
           ))}
-        </ul>
+        </RevealList>
       </div>
 
       <div className="container-page mt-20 grid gap-6 sm:mt-24 lg:mt-32 lg:grid-cols-12 lg:gap-16">
         <h3 className="t-h3 text-white lg:col-span-5">Beyond engineering</h3>
-        <ul className="space-y-3 font-serif text-[clamp(1.375rem,1.1rem+0.8vw,1.875rem)] leading-[1.3] text-white lg:col-span-7">
+        <ul className="grid gap-x-10 gap-y-3.5 sm:grid-cols-2 lg:col-span-7 lg:pt-1.5">
           {aerveil.beyond.map((item) => (
-            <li key={item} className="text-pretty">
-              {keepHyphens(item)}
+            <li key={item} className="flex gap-3 leading-snug text-mist sm:text-[1.0625rem] sm:last:col-span-2">
+              <span aria-hidden className="mt-[0.5em] size-1.5 shrink-0 rounded-full bg-white/45" />
+              <span className="text-pretty">{keepHyphens(item)}</span>
             </li>
           ))}
         </ul>
