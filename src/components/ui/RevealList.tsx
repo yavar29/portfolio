@@ -3,12 +3,22 @@
 import { useEffect, useRef, type ReactNode } from "react";
 
 /**
- * A list whose `.reveal-item` children fade up in sequence when it scrolls into view.
- * Server HTML is fully visible; the list is hidden only if it starts below the fold,
+ * A container whose `.reveal-item` children fade up in sequence when it scrolls into view.
+ * Server HTML is fully visible; the container is hidden only if it starts below the fold,
  * so there is no flash on load and nothing is lost without JavaScript.
  */
-export default function RevealList({ children, className }: { children: ReactNode; className?: string }) {
-  const ref = useRef<HTMLUListElement>(null);
+export default function RevealList({
+  children,
+  className,
+  as: Tag = "ul",
+  label,
+}: {
+  children: ReactNode;
+  className?: string;
+  as?: "ul" | "ol" | "div" | "figure";
+  label?: string;
+}) {
+  const ref = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const list = ref.current;
@@ -28,8 +38,9 @@ export default function RevealList({ children, className }: { children: ReactNod
   }, []);
 
   return (
-    <ul ref={ref} className={className}>
+    // The ref type is widened so one component can render any of the allowed tags.
+    <Tag ref={ref as React.RefObject<never>} className={className} aria-label={label}>
       {children}
-    </ul>
+    </Tag>
   );
 }

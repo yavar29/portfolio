@@ -280,6 +280,82 @@
     -webkit-text-stroke-color: var(--color-ink);
   }
 
+  /* Project architecture diagram: a black panel with the dot grid, nodes and arrows. */
+  .flow-panel {
+    display: flex;
+    align-items: center;
+    min-height: 17rem;
+    padding: 1.75rem 1.25rem;
+    border-radius: 1.75rem;
+    background-color: var(--color-night);
+    background-image: radial-gradient(circle, rgb(255 255 255 / 0.07) 1px, transparent 1.25px);
+    background-size: 24px 24px;
+  }
+
+  @media (min-width: 640px) {
+    .flow-panel {
+      padding: 2.25rem 2rem;
+    }
+  }
+
+  .flow-node {
+    border: 1px solid rgb(255 255 255 / 0.16);
+    border-radius: 0.875rem;
+    background: rgb(255 255 255 / 0.04);
+    padding: 0.6rem 0.75rem;
+    color: var(--color-mist);
+    font-size: 0.8125rem;
+    line-height: 1.35;
+    text-align: center;
+  }
+
+  .flow-node-core {
+    border-color: #fff;
+    background: #fff;
+    color: var(--color-ink);
+    font-weight: 600;
+  }
+
+  /* Arrow between stages: points down on phones, right from md up. */
+  .flow-link {
+    position: relative;
+    flex: none;
+    align-self: center;
+    width: 1px;
+    height: 1.75rem;
+    margin-block: 0.375rem;
+    background: rgb(255 255 255 / 0.35);
+  }
+
+  .flow-link::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 7px;
+    height: 7px;
+    border-right: 1px solid rgb(255 255 255 / 0.6);
+    border-bottom: 1px solid rgb(255 255 255 / 0.6);
+    transform: translate(-50%, 0) rotate(45deg);
+  }
+
+  @media (min-width: 768px) {
+    .flow-link {
+      width: 1.75rem;
+      height: 1px;
+      margin-block: 0;
+      margin-inline: 0.5rem;
+    }
+
+    .flow-link::after {
+      left: auto;
+      right: 0;
+      bottom: auto;
+      top: 50%;
+      transform: translate(0, -50%) rotate(-45deg);
+    }
+  }
+
   /* Disclosure panel: animates to and from its natural height. */
   .disclosure {
     display: grid;

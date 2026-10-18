@@ -283,6 +283,12 @@ export interface ProjectLink {
   href: string;
 }
 
+export interface FlowNode {
+  label: string;
+  // The node that coordinates the rest; drawn filled.
+  core?: boolean;
+}
+
 export interface FeaturedProject {
   title: string;
   kind: string;
@@ -290,6 +296,9 @@ export interface FeaturedProject {
   stack: string[];
   links: ProjectLink[];
   collaborator?: { name: string; href: string };
+  // How the system works, left to right. Each stage lists nodes that run side by side.
+  // Labels come only from the points above.
+  flow: FlowNode[][];
 }
 
 export const featuredProjects: FeaturedProject[] = [
@@ -306,6 +315,12 @@ export const featuredProjects: FeaturedProject[] = [
       { label: "Demo video", href: "https://github.com/user-attachments/assets/8d0edeee-3438-42ed-931a-97b1560b84af" },
     ],
     collaborator: { name: "Ishita Srivastava", href: "https://ishitasrivastava.me/" },
+    flow: [
+      [{ label: "Weather question" }],
+      [{ label: "Claude + LangGraph agents", core: true }],
+      [{ label: "Xweather MCP live data" }, { label: "Sandboxed code" }, { label: "Multimodal RAG, Pinecone" }],
+      [{ label: "Interactive ECharts dashboard" }],
+    ],
   },
   {
     title: "Deep Research Pro",
@@ -319,6 +334,12 @@ export const featuredProjects: FeaturedProject[] = [
       { label: "GitHub", href: "https://github.com/yavar29/GenAI_Projects/tree/main/OpenAI_Agents_SDK/deep_research_pro" },
       { label: "Demo video", href: "https://github.com/user-attachments/assets/e4bb495b-50b2-4314-aea6-31ef69b3d5ec" },
     ],
+    flow: [
+      [{ label: "Query planning, human-reviewed", core: true }],
+      [{ label: "Search agent" }, { label: "Search agent" }, { label: "Search agent" }],
+      [{ label: "Adaptive follow-up waves" }],
+      [{ label: "Cited report, Pydantic-validated" }],
+    ],
   },
   {
     title: "Context-Aware RAG Assistant",
@@ -329,6 +350,11 @@ export const featuredProjects: FeaturedProject[] = [
     stack: ["LangChain", "FAISS", "FastAPI", "Gradio"],
     links: [
       { label: "GitHub", href: "https://github.com/yavar29/GenAI_Projects/tree/main/Context-Aware_AI_RAG_Assistant" },
+    ],
+    flow: [
+      [{ label: "FAISS vector index" }],
+      [{ label: "RAG pipeline, runtime persona", core: true }],
+      [{ label: "Answer" }, { label: "Pushover alert" }],
     ],
   },
 ];
