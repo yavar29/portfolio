@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element -- static export ships pre-optimized AVIF/WebP sources */
 import type { CSSProperties } from "react";
-import { Download, Github, Linkedin } from "lucide-react";
+import { Download } from "lucide-react";
+import { GitHubMark, LinkedInMark } from "@/components/ui/BrandIcons";
 import { RESUME, SITE, SOCIAL_LINKS } from "@/lib/constants";
 import { professionalCert } from "@/lib/data";
 
@@ -56,11 +57,11 @@ export default function HeroSection() {
               Resume
             </a>
             <a href={SOCIAL_LINKS.github} target="_blank" rel="noopener noreferrer" className={secondaryButton}>
-              <Github aria-hidden className="size-4" />
+              <GitHubMark className="size-4" />
               GitHub
             </a>
             <a href={SOCIAL_LINKS.linkedin} target="_blank" rel="noopener noreferrer" className={secondaryButton}>
-              <Linkedin aria-hidden className="size-4" />
+              <LinkedInMark className="size-4" />
               LinkedIn
             </a>
           </div>

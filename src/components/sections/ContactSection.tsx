@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { AlertCircle, ArrowUpRight, CheckCircle, Download, Loader2 } from "lucide-react";
+import { AlertCircle, ArrowRight, Check, CheckCircle, Copy, Download, Loader2, MapPin } from "lucide-react";
+import { GitHubMark, LinkedInMark } from "@/components/ui/BrandIcons";
 import { cn } from "@/lib/utils";
 import { RESUME, SITE, SOCIAL_LINKS, TURNSTILE_SITE_KEY } from "@/lib/constants";
 
@@ -19,8 +20,12 @@ type FormStatus = "idle" | "submitting" | "success" | "error";
 const TOPICS = ["Hiring", "Collaboration", "Just saying hi"];
 const TURNSTILE_SRC = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
 
+// Underlined fields: quieter than boxes inside the form panel, and the focus state is the line.
 const fieldClass =
-  "w-full rounded-xl border border-white/12 bg-white/[0.04] px-4 py-3 text-[0.9688rem] text-on-night outline-none transition-colors duration-200 placeholder:text-on-night-2/60 focus:border-white/60 focus:bg-white/[0.06] disabled:opacity-50";
+  "w-full border-b border-white/20 bg-transparent px-0 py-2.5 text-[1rem] text-on-night outline-none transition-colors duration-200 placeholder:text-on-night-2/50 focus:border-white disabled:opacity-50";
+const labelClass = "text-[0.8125rem] font-medium text-on-night-2";
+const linkPill =
+  "inline-flex items-center gap-2.5 rounded-full border border-white/15 px-4 py-2.5 text-[0.9375rem] text-on-night transition-colors duration-200 hover:border-white/45";
 
 export default function ContactSection() {
   const [topic, setTopic] = useState(TOPICS[0]);
@@ -29,6 +34,17 @@ export default function ContactSection() {
   const formRef = useRef<HTMLFormElement>(null);
   const turnstileRef = useRef<HTMLDivElement>(null);
   const widgetIdRef = useRef<string | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  async function copyEmail() {
+    try {
+      await navigator.clipboard.writeText(SITE.email);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Clipboard unavailable (insecure context or denied): the mailto link still works.
+    }
+  }
 
   // Load the Turnstile script only when the form is about to scroll into view.
   useEffect(() => {
@@ -107,57 +123,69 @@ export default function ContactSection() {
   const busy = status === "submitting";
 
   return (
-    <section id="contact" data-nav-theme="dark" className="on-dark bg-night text-on-night">
-      <div className="container-page section-pad grid gap-14 lg:grid-cols-12 lg:gap-12">
-        <div className="lg:col-span-5">
-          <h2 className="t-h2">Get in touch</h2>
-          <p className="t-lead mt-5 max-w-[34ch] text-on-night-2">
+    <section
+      id="contact"
+      data-nav-theme="dark"
+      className="on-dark flex min-h-svh flex-col justify-center bg-night bg-[radial-gradient(circle,rgb(255_255_255/0.07)_1px,transparent_1.25px)] bg-[length:24px_24px] text-on-night"
+    >
+      <div className="container-page section-pad grid items-center gap-14 lg:grid-cols-12 lg:gap-16">
+        <div className="lg:col-span-6">
+          <h2 className="text-[clamp(3.25rem,2rem+5vw,6.5rem)] leading-[0.95] tracking-[-0.03em] text-white">
+            Get in touch
+          </h2>
+          <p className="t-lead mt-6 max-w-[34ch] text-on-night-2">
             Email me directly, or send a message with the form.
           </p>
-          <a
-            href={SOCIAL_LINKS.email}
-            className="link mt-10 inline-block break-all font-serif text-[1.5rem] leading-tight text-on-night sm:text-[1.875rem]"
-          >
-            {SITE.email}
-          </a>
-          <ul className="mt-8 space-y-3 text-[0.9688rem]">
-            <li>
-              <a
-                href={SOCIAL_LINKS.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="link inline-flex items-center gap-1 text-on-night"
-              >
-                LinkedIn
-                <ArrowUpRight aria-hidden className="size-3.5" />
-              </a>
-            </li>
-            <li>
-              <a
-                href={SOCIAL_LINKS.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="link inline-flex items-center gap-1 text-on-night"
-              >
-                GitHub
-                <ArrowUpRight aria-hidden className="size-3.5" />
-              </a>
-            </li>
-          </ul>
-          <a
-            href={RESUME.href}
-            download={RESUME.filename}
-            className="mt-10 inline-flex items-center gap-2 rounded-full bg-on-night px-5 py-3 text-[0.9375rem] font-medium text-night transition-colors duration-200 hover:bg-white"
-          >
-            <Download aria-hidden className="size-4" />
-            Download resume
-          </a>
+
+          <div className="mt-10 flex flex-wrap items-center gap-x-4 gap-y-3">
+            <a
+              href={SOCIAL_LINKS.email}
+              className="link break-all font-serif text-[1.3125rem] leading-tight text-white sm:text-[2rem]"
+            >
+              {SITE.email}
+            </a>
+            <button
+              type="button"
+              onClick={copyEmail}
+              aria-label={copied ? "Email address copied" : "Copy email address"}
+              className="inline-flex size-10 shrink-0 items-center justify-center rounded-full border border-white/15 text-on-night-2 transition-colors duration-200 hover:border-white/45 hover:text-white"
+            >
+              {copied ? <Check aria-hidden className="size-4 text-white" /> : <Copy aria-hidden className="size-4" />}
+            </button>
+            <span aria-live="polite" className="sr-only">
+              {copied ? "Email address copied" : ""}
+            </span>
+          </div>
+
+          <div className="mt-8 flex flex-wrap gap-2.5">
+            <a href={SOCIAL_LINKS.linkedin} target="_blank" rel="noopener noreferrer" className={linkPill}>
+              <LinkedInMark className="size-[1.125rem]" />
+              LinkedIn
+            </a>
+            <a href={SOCIAL_LINKS.github} target="_blank" rel="noopener noreferrer" className={linkPill}>
+              <GitHubMark className="size-[1.125rem]" />
+              GitHub
+            </a>
+            <a
+              href={RESUME.href}
+              download={RESUME.filename}
+              className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2.5 text-[0.9375rem] font-medium text-ink transition-colors duration-200 hover:bg-mist"
+            >
+              <Download aria-hidden className="size-4" />
+              Download resume
+            </a>
+          </div>
+
+          <p className="mt-10 inline-flex items-center gap-2 text-sm text-on-night-2">
+            <MapPin aria-hidden className="size-4" />
+            {SITE.location}
+          </p>
         </div>
 
         <form
           ref={formRef}
           onSubmit={handleSubmit}
-          className="space-y-6 lg:col-span-7"
+          className="rounded-[1.75rem] border border-white/10 bg-charcoal/80 p-6 sm:p-8 lg:col-span-6 lg:p-10"
           aria-describedby="contact-status"
         >
           <input type="hidden" name="_subject" value={`Portfolio contact: ${topic}`} />
@@ -165,7 +193,7 @@ export default function ContactSection() {
           <input type="hidden" name="category" value={topic} />
 
           <fieldset>
-            <legend className="text-sm font-medium text-on-night-2">What is this about?</legend>
+            <legend className={labelClass}>What is this about?</legend>
             <div className="mt-3 flex flex-wrap gap-2">
               {TOPICS.map((t) => (
                 <label
@@ -173,8 +201,8 @@ export default function ContactSection() {
                   className={cn(
                     "cursor-pointer rounded-full border px-4 py-2 text-sm transition-colors duration-200 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-on-night",
                     topic === t
-                      ? "border-on-night bg-white/10 text-on-night"
-                      : "border-white/12 text-on-night-2 hover:border-white/30"
+                      ? "border-white bg-white text-ink"
+                      : "border-white/15 text-on-night-2 hover:border-white/40 hover:text-on-night"
                   )}
                 >
                   <input
@@ -191,54 +219,61 @@ export default function ContactSection() {
             </div>
           </fieldset>
 
-          <div className="grid gap-6 sm:grid-cols-2">
+          <div className="mt-8 grid gap-7 sm:grid-cols-2 sm:gap-6">
             <div>
-              <label htmlFor="name" className="text-sm font-medium text-on-night-2">
+              <label htmlFor="name" className={labelClass}>
                 Name
               </label>
-              <input id="name" name="name" type="text" required autoComplete="name" disabled={busy} className={cn(fieldClass, "mt-2")} />
+              <input id="name" name="name" type="text" required autoComplete="name" disabled={busy} className={fieldClass} />
             </div>
             <div>
-              <label htmlFor="email" className="text-sm font-medium text-on-night-2">
+              <label htmlFor="email" className={labelClass}>
                 Email
               </label>
-              <input id="email" name="email" type="email" required autoComplete="email" disabled={busy} className={cn(fieldClass, "mt-2")} />
+              <input id="email" name="email" type="email" required autoComplete="email" disabled={busy} className={fieldClass} />
             </div>
           </div>
 
-          <div>
-            <label htmlFor="message" className="text-sm font-medium text-on-night-2">
+          <div className="mt-7">
+            <label htmlFor="message" className={labelClass}>
               Message
             </label>
-            <textarea id="message" name="message" required rows={5} disabled={busy} className={cn(fieldClass, "mt-2 resize-y")} />
+            <textarea id="message" name="message" required rows={4} disabled={busy} className={cn(fieldClass, "resize-y")} />
           </div>
 
-          <div ref={turnstileRef} className="min-h-[65px]" />
+          <div ref={turnstileRef} className="mt-7 min-h-[65px]" />
 
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-            <button
-              type="submit"
-              disabled={busy}
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-[0.9375rem] font-medium text-ink transition-colors duration-200 hover:bg-mist disabled:opacity-60"
-            >
-              {busy && <Loader2 aria-hidden className="size-4 animate-spin" />}
-              {busy ? "Sending…" : "Send message"}
-            </button>
-            <p id="contact-status" aria-live="polite" className="text-sm">
-              {status === "success" && (
-                <span className="inline-flex items-center gap-2 text-on-night">
-                  <CheckCircle aria-hidden className="size-4 text-on-night" />
-                  Message sent. I&apos;ll reply by email.
-                </span>
-              )}
-              {status === "error" && (
-                <span className="inline-flex items-center gap-2 text-[#f5b5c0]">
-                  <AlertCircle aria-hidden className="size-4" />
-                  {errorMessage}
-                </span>
-              )}
-            </p>
-          </div>
+          <button
+            type="submit"
+            disabled={busy}
+            className="group mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-6 py-3.5 text-[0.9375rem] font-medium text-ink transition-colors duration-200 hover:bg-mist disabled:opacity-60"
+          >
+            {busy ? (
+              <>
+                <Loader2 aria-hidden className="size-4 animate-spin" />
+                Sending…
+              </>
+            ) : (
+              <>
+                Send message
+                <ArrowRight aria-hidden className="size-4 transition-transform duration-200 group-hover:translate-x-0.5" />
+              </>
+            )}
+          </button>
+          <p id="contact-status" aria-live="polite" className="mt-4 min-h-5 text-sm">
+            {status === "success" && (
+              <span className="inline-flex items-center gap-2 text-on-night">
+                <CheckCircle aria-hidden className="size-4 text-on-night" />
+                Message sent. I&apos;ll reply by email.
+              </span>
+            )}
+            {status === "error" && (
+              <span className="inline-flex items-center gap-2 text-[#f5b5c0]">
+                <AlertCircle aria-hidden className="size-4" />
+                {errorMessage}
+              </span>
+            )}
+          </p>
         </form>
       </div>
     </section>

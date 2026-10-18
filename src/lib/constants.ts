@@ -28,7 +28,7 @@ export const NAV_ITEMS = [
   { label: "Journey", href: "#journey" },
   { label: "Aerveil", href: "#aerveil" },
   { label: "Projects", href: "#projects" },
-  { label: "Skills", href: "#skills" },
   { label: "Certifications", href: "#certifications" },
+  { label: "Skills", href: "#skills" },
   { label: "Contact", href: "#contact" },
 ] as const;

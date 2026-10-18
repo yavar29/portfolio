@@ -16,8 +16,8 @@ export default function Home() {
       <JourneySection />
       <AerveilSection />
       <ProjectsSection />
-      <SkillsSection />
       <CertificationsSection />
+      <SkillsSection />
       <ContactSection />
     </SectionStack>
   );

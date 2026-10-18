@@ -5,6 +5,8 @@ export interface Certification {
   issuer: string;
   date: string;
   badge: string;
+  // Higher-resolution badge files for large displays, as a srcset.
+  badgeSet?: string;
   verifyUrl: string;
   verifyLabel: string;
 }
@@ -15,6 +17,8 @@ export const certifications: Certification[] = [
     issuer: "Anthropic",
     date: "October 2026",
     badge: "/badges/claude-certified-architect-professional.webp",
+    badgeSet:
+      "/badges/claude-certified-architect-professional.webp 320w, /badges/claude-certified-architect-professional-600.webp 600w",
     verifyUrl: "https://www.credly.com/badges/99356023-0947-49a6-8c38-007c8ad9bcde/public_url",
     verifyLabel: "Verify on Credly",
   },
@@ -23,6 +27,8 @@ export const certifications: Certification[] = [
     issuer: "Anthropic",
     date: "July 2026",
     badge: "/badges/claude-certified-architect-foundations.webp",
+    badgeSet:
+      "/badges/claude-certified-architect-foundations.webp 320w, /badges/claude-certified-architect-foundations-480.webp 480w",
     verifyUrl: "https://www.credly.com/badges/4e40f189-2df1-492b-8dfe-dfb93a568198/public_url",
     verifyLabel: "Verify on Credly",
   },
