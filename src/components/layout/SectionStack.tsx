@@ -18,10 +18,12 @@ export default function SectionStack({ children }: { children: ReactNode }) {
     // stale one measures as nothing, which sent in-page links to the top of the page.
     const sheets = () => Array.from(root.children) as HTMLElement[];
     const marginTop = (sheet: HTMLElement) => parseFloat(getComputedStyle(sheet).marginTop) || 0;
+    const marginBottom = (sheet: HTMLElement) => parseFloat(getComputedStyle(sheet).marginBottom) || 0;
 
     // A sheet pins once the strip the next sheet overlaps has gone below the screen's bottom
-    // edge, so the next sheet only comes into view as it slides up. Sheets no taller than the
-    // screen (plus that strip) pin at the top.
+    // edge. The sheet's bottom margin (the dwell) then scrolls by behind it, so the next sheet
+    // only starts to slide up after that. Sheets no taller than the screen (plus that strip)
+    // pin at the top.
     const layout = () => {
       const viewport = window.innerHeight;
       const all = sheets();
@@ -55,7 +57,9 @@ export default function SectionStack({ children }: { children: ReactNode }) {
     // links would land in the wrong place. Scroll to the section's place in the flow instead.
     const flowTop = (all: HTMLElement[], index: number) => {
       let top = root.getBoundingClientRect().top + window.scrollY;
-      for (let j = 0; j < index; j++) top += all[j].offsetHeight + marginTop(all[j + 1]);
+      // The dwell (a positive bottom margin) and the overlap (a negative top margin) collapse
+      // into one gap, which is their sum.
+      for (let j = 0; j < index; j++) top += all[j].offsetHeight + marginBottom(all[j]) + marginTop(all[j + 1]);
       return top;
     };
     const onClick = (e: MouseEvent) => {

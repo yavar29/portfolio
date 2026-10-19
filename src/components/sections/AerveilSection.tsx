@@ -4,7 +4,6 @@ import AerveilTour from "@/components/sections/AerveilTour";
 import RevealList from "@/components/ui/RevealList";
 import { InstagramMark, LinkedInMark } from "@/components/ui/BrandIcons";
 import { aerveil } from "@/lib/data";
-import { cn } from "@/lib/utils";
 
 const order = (i: number) => ({ "--i": i * 1.5 }) as CSSProperties;
 
@@ -96,34 +95,15 @@ export default function AerveilSection() {
         </RevealList>
       </div>
 
-      {/*
-        Beyond engineering: the design-partner collaboration is the feature, set large on a
-        charcoal panel; the rest of the work sits beside it as a list.
-      */}
       <div className="container-page mt-20 sm:mt-24 lg:mt-28">
         <h3 className="t-h3 text-white">Beyond engineering</h3>
-        <div className="mt-8 grid gap-6 lg:mt-10 lg:grid-cols-12 lg:gap-10">
-          <div className="flex items-end rounded-[1.5rem] border border-white/10 bg-night-2 bg-[radial-gradient(circle,rgb(255_255_255/0.07)_1px,transparent_1.25px)] bg-[length:24px_24px] p-7 sm:p-10 lg:col-span-7 lg:min-h-[19rem] lg:p-12">
-            <p className="max-w-[24ch] text-balance font-serif text-[clamp(1.625rem,1.15rem+1.5vw,2.5rem)] leading-[1.16] text-white">
-              {keepHyphens(aerveil.beyondHighlight)}
-            </p>
-          </div>
-          <RevealList className="flex flex-col lg:col-span-5">
-            {aerveil.beyond.map((item, i) => (
-              <li
-                key={item}
-                style={order(i)}
-                className={cn(
-                  "reveal-item flex flex-1 items-center gap-4 py-5 text-[1.0625rem] leading-snug text-white sm:text-[1.125rem]",
-                  i > 0 && "vine-rule"
-                )}
-              >
-                <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-white/50" />
-                {item}
-              </li>
-            ))}
-          </RevealList>
-        </div>
+        <RevealList className="mt-8 grid gap-x-8 sm:grid-cols-3 lg:mt-10 lg:gap-x-10">
+          {aerveil.beyond.map((item, i) => (
+            <li key={item} style={order(i)} className="reveal-item vine-rule py-6">
+              <p className="font-serif text-[1.375rem] leading-snug text-white sm:text-[1.5rem]">{keepHyphens(item)}</p>
+            </li>
+          ))}
+        </RevealList>
       </div>
     </section>
   );

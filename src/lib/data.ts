@@ -305,7 +305,7 @@ export const aerveil = {
     {
       title: "Data ingestion pipelines",
       detail:
-        "Hourly, high-resolution NOAA forecasts and observations mapped to every vineyard block through fault-tolerant pipelines with source fallbacks and resumable backfills.",
+        "Hourly, high-resolution weather model forecasts and observations mapped to every vineyard block through fault-tolerant pipelines with source fallbacks and resumable backfills.",
     },
     {
       title: "LLM agents & tool use",
@@ -323,15 +323,7 @@ export const aerveil = {
         "GCP infrastructure defined in Terraform on a private VPC, with Secret Manager, least-privilege access, per-grower data isolation, keyless gated CI/CD and log-based alerts.",
     },
   ] satisfies AerveilItem[],
-  // Beyond engineering: the design-partner collaboration is set as the feature.
-  beyondHighlight:
-    "Collaborating closely with the design partner to refine the product, translating field feedback into shipped improvements",
-  beyond: [
-    "Built and run aerveil.ai",
-    "Product demos and grower onboarding",
-    "On-site vineyard visits",
-    "Marketing and launch content",
-  ],
+  beyond: ["Product demos and grower onboarding", "On-site vineyard visits", "Marketing and launch content"],
   status: "Testing with our first design partner ahead of the season.",
 };
 

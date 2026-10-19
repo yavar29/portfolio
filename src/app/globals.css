@@ -205,16 +205,6 @@
     transform: translateY(18px);
   }
 
-  /* About portrait: a curtain that opens upward the first time the panel scrolls into view. */
-  .curtain {
-    clip-path: inset(0 0 0 0);
-    transition: clip-path 1.3s var(--ease-out-quint);
-  }
-
-  [data-reveal="pending"] .curtain {
-    clip-path: inset(100% 0 0 0);
-  }
-
   /*
    * Journey marker: a white medallion on the road holding the milestone's logo.
    * It waits small and grey, then pops into color as the road reaches it.
@@ -460,6 +450,8 @@
  */
 .section-stack {
   --sheet-overlap: 2rem;
+  /* How far a page stays put, fully in view, before the next one starts to slide over it. */
+  --sheet-dwell: 30vh;
 }
 
 .section-stack > * {
@@ -481,6 +473,11 @@
  */
 .section-stack > *:not(:last-child) {
   min-height: calc(100lvh + var(--sheet-overlap));
+  /*
+   * Scroll room after the page, hidden behind it while it is pinned: reaching a page's bottom
+   * and scrolling a little more changes nothing; the next page only arrives after the dwell.
+   */
+  margin-bottom: var(--sheet-dwell);
 }
 
 .section-stack[data-stack="on"] > * {
