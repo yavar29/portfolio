@@ -139,7 +139,7 @@ export const milestones: Milestone[] = [
     period: "Mar 2026 – present",
     year: "2026",
     logo: { src: "/logos/aerveil.svg", width: 3548, height: 3622 },
-    title: "Founding AI Engineer",
+    title: "AI Engineer",
     org: "Aerveil",
     place: "San Jose, CA",
     summary:

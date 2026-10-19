@@ -412,21 +412,14 @@
     clip-path: inset(0 100% 0 0);
   }
 
-  /*
-   * Contact: a faint underline sits under the email address at rest, and a white one draws over
-   * it from the left on hover.
-   */
-  .email-link {
-    background-image: linear-gradient(currentColor, currentColor), linear-gradient(rgb(255 255 255 / 0.22), rgb(255 255 255 / 0.22));
-    background-size: 0% 2px, 100% 2px;
-    background-position: 0 100%;
-    background-repeat: no-repeat;
-    padding-bottom: 0.1em;
-    transition: background-size 0.6s var(--ease-out-quint);
+  /* Contact: the heavy rule under "Get in touch" draws in from the left the first time it shows. */
+  .contact-rule {
+    transform-origin: left center;
+    transition: transform 1.4s var(--ease-out-quint) 0.15s;
   }
 
-  .email-link:hover {
-    background-size: 100% 2px, 100% 2px;
+  [data-reveal="pending"] .contact-rule {
+    transform: scaleX(0);
   }
 
   /* "Get in touch" wipes in from the left the first time it is seen; the em insets clear the glyphs. */
