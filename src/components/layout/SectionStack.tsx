@@ -14,16 +14,20 @@ export default function SectionStack({ children }: { children: ReactNode }) {
   useEffect(() => {
     const root = ref.current;
     if (!root) return;
-    const sheets = Array.from(root.children) as HTMLElement[];
+    // Always the sections as they are now: a section can be re-rendered as a new element, and a
+    // stale one measures as nothing, which sent in-page links to the top of the page.
+    const sheets = () => Array.from(root.children) as HTMLElement[];
+    const marginTop = (sheet: HTMLElement) => parseFloat(getComputedStyle(sheet).marginTop) || 0;
 
     // A sheet pins once the strip the next sheet overlaps has gone below the screen's bottom
     // edge, so the next sheet only comes into view as it slides up. Sheets no taller than the
     // screen (plus that strip) pin at the top.
     const layout = () => {
       const viewport = window.innerHeight;
-      sheets.forEach((sheet, i) => {
-        const next = sheets[i + 1];
-        const overlap = next ? -parseFloat(getComputedStyle(next).marginTop) || 0 : 0;
+      const all = sheets();
+      all.forEach((sheet, i) => {
+        const next = all[i + 1];
+        const overlap = next ? -marginTop(next) : 0;
         sheet.style.setProperty("--sheet-top", `${Math.min(0, viewport + overlap - sheet.offsetHeight)}px`);
       });
     };
@@ -32,10 +36,11 @@ export default function SectionStack({ children }: { children: ReactNode }) {
     const paint = () => {
       frame = 0;
       const viewport = window.innerHeight;
-      for (let i = 0; i < sheets.length - 1; i++) {
-        const nextTop = sheets[i + 1].getBoundingClientRect().top;
+      const all = sheets();
+      for (let i = 0; i < all.length - 1; i++) {
+        const nextTop = all[i + 1].getBoundingClientRect().top;
         const cover = Math.min(1, Math.max(0, 1 - nextTop / viewport));
-        sheets[i].style.setProperty("--cover", cover.toFixed(3));
+        all[i].style.setProperty("--cover", cover.toFixed(3));
       }
     };
     const schedule = () => {
@@ -48,21 +53,21 @@ export default function SectionStack({ children }: { children: ReactNode }) {
 
     // A pinned section reports where it is stuck, not where it sits in the page, so in-page
     // links would land in the wrong place. Scroll to the section's place in the flow instead.
-    const flowTop = (index: number) => {
+    const flowTop = (all: HTMLElement[], index: number) => {
       let top = root.getBoundingClientRect().top + window.scrollY;
-      for (let j = 0; j < index; j++) {
-        top += sheets[j].offsetHeight + parseFloat(getComputedStyle(sheets[j + 1]).marginTop);
-      }
+      for (let j = 0; j < index; j++) top += all[j].offsetHeight + marginTop(all[j + 1]);
       return top;
     };
     const onClick = (e: MouseEvent) => {
       if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
       const link = (e.target as Element).closest<HTMLAnchorElement>('a[href^="#"]');
-      const index = link ? sheets.findIndex((sheet) => `#${sheet.id}` === link.getAttribute("href")) : -1;
-      if (!link || index < 0) return;
+      if (!link) return;
+      const all = sheets();
+      const index = all.findIndex((sheet) => `#${sheet.id}` === link.getAttribute("href"));
+      if (index < 0) return;
       e.preventDefault();
       const smooth = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      window.scrollTo({ top: flowTop(index), behavior: smooth ? "smooth" : "auto" });
+      window.scrollTo({ top: flowTop(all, index), behavior: smooth ? "smooth" : "auto" });
       history.pushState(null, "", link.getAttribute("href"));
     };
 
@@ -70,15 +75,24 @@ export default function SectionStack({ children }: { children: ReactNode }) {
     paint();
     root.dataset.stack = "on";
 
-    const observer = new ResizeObserver(relayout);
-    for (const sheet of sheets) observer.observe(sheet);
+    const resize = new ResizeObserver(relayout);
+    const watch = () => {
+      resize.disconnect();
+      for (const sheet of sheets()) resize.observe(sheet);
+      relayout();
+    };
+    watch();
+    // Re-measure and re-observe whenever a section is swapped for a new element.
+    const mutations = new MutationObserver(watch);
+    mutations.observe(root, { childList: true });
     window.addEventListener("resize", relayout);
     window.addEventListener("scroll", schedule, { passive: true });
     document.addEventListener("click", onClick);
 
     return () => {
       cancelAnimationFrame(frame);
-      observer.disconnect();
+      resize.disconnect();
+      mutations.disconnect();
       window.removeEventListener("resize", relayout);
       window.removeEventListener("scroll", schedule);
       document.removeEventListener("click", onClick);
