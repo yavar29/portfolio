@@ -27,16 +27,16 @@ const TIERS: { width: number; height: number; sources: Source[] }[] = [
     width: 1280,
     height: 720,
     sources: [
-      { src: "/video/aerveil-tour-720-av1.mp4", type: 'video/mp4; codecs="av01.0.08M.10"', bitrate: 375_000 },
-      { src: "/video/aerveil-tour-720-h264.mp4", type: 'video/mp4; codecs="avc1.640020"', bitrate: 560_000 },
+      { src: "/video/aerveil-tour-720-av1.mp4", type: 'video/mp4; codecs="av01.0.08M.10"', bitrate: 350_000 },
+      { src: "/video/aerveil-tour-720-h264.mp4", type: 'video/mp4; codecs="avc1.640020"', bitrate: 530_000 },
     ],
   },
   {
     width: 2560,
     height: 1440,
     sources: [
-      { src: "/video/aerveil-tour-1440-av1.mp4", type: 'video/mp4; codecs="av01.0.12M.10"', bitrate: 850_000 },
-      { src: "/video/aerveil-tour-1440-h264.mp4", type: 'video/mp4; codecs="avc1.640033"', bitrate: 1_250_000 },
+      { src: "/video/aerveil-tour-1440-av1.mp4", type: 'video/mp4; codecs="av01.0.12M.10"', bitrate: 805_000 },
+      { src: "/video/aerveil-tour-1440-h264.mp4", type: 'video/mp4; codecs="avc1.640033"', bitrate: 1_180_000 },
     ],
   },
 ];
