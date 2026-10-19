@@ -107,6 +107,9 @@ resource "google_compute_backend_bucket" "website" {
   name        = "website-backend"
   bucket_name = google_storage_bucket.website.name
   enable_cdn  = true
+  # The bucket stores files uncompressed; the CDN gzips or Brotli-compresses text responses for
+  # browsers that accept it. Enabled 2026-10-18 with gcloud, recorded here to match.
+  compression_mode = "AUTOMATIC"
 
   cdn_policy {
     cache_mode        = "CACHE_ALL_STATIC"
