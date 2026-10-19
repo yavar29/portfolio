@@ -12,15 +12,24 @@ export default function Navbar() {
   const [overDark, setOverDark] = useState(true);
 
   useEffect(() => {
-    // Sections overlap as stacked sheets, so ask the page which section is actually on top
-    // under the bar (for its light or dark style) and at the middle of the screen (for the
-    // active link). The hero has no nav item, so nothing is highlighted over it.
+    // Sections overlap as stacked sheets, so find which one is on top under the bar (for its
+    // light or dark style) and at the middle of the screen (for the active link): the last one,
+    // in page order, that spans that height. Positions only, no hit-testing, so it stays cheap
+    // on every scroll frame. The hero has no nav item, so nothing is highlighted over it.
     let frame = 0;
     const update = () => {
       frame = 0;
-      const x = window.innerWidth / 2;
-      const underBar = document.elementFromPoint(x, 72)?.closest("section");
-      const inView = document.elementFromPoint(x, window.innerHeight * 0.47)?.closest("section");
+      const sheets = Array.from(document.querySelectorAll<HTMLElement>(".section-stack > section"));
+      const rects = sheets.map((sheet) => sheet.getBoundingClientRect());
+      const topmostAt = (y: number) => {
+        let hit: HTMLElement | undefined;
+        rects.forEach((r, i) => {
+          if (r.top <= y && r.bottom > y) hit = sheets[i];
+        });
+        return hit;
+      };
+      const underBar = topmostAt(72);
+      const inView = topmostAt(window.innerHeight * 0.47);
       setScrolled(window.scrollY > 8);
       setOverDark(underBar?.dataset.navTheme === "dark");
       setActive(inView?.id ?? "");

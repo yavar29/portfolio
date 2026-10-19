@@ -5,8 +5,8 @@ import { useEffect, useRef, type ReactNode } from "react";
 /**
  * Lays the page sections out as stacked sheets: each section holds still once it is fully
  * in view, and the next one slides up over it while it dims.
- * The rounded, overlapping edges are plain CSS; this component only adds the sticky offsets
- * (which depend on each section's height) and the dimming.
+ * The rounded, overlapping edges and the sticky offsets are CSS; this component only measures
+ * each sheet's height for that CSS and drives the dimming.
  */
 export default function SectionStack({ children }: { children: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -20,18 +20,33 @@ export default function SectionStack({ children }: { children: ReactNode }) {
     const marginTop = (sheet: HTMLElement) => parseFloat(getComputedStyle(sheet).marginTop) || 0;
     const marginBottom = (sheet: HTMLElement) => parseFloat(getComputedStyle(sheet).marginBottom) || 0;
 
-    // A sheet pins once the strip the next sheet overlaps has gone below the screen's bottom
-    // edge. The sheet's bottom margin (the dwell) then scrolls by behind it, so the next sheet
-    // only starts to slide up after that. Sheets no taller than the screen (plus that strip)
-    // pin at the top.
-    const layout = () => {
-      const viewport = window.innerHeight;
-      const all = sheets();
-      all.forEach((sheet, i) => {
-        const next = all[i + 1];
-        const overlap = next ? -marginTop(next) : 0;
-        sheet.style.setProperty("--sheet-top", `${Math.min(0, viewport + overlap - sheet.offsetHeight)}px`);
-      });
+    // The sticky offset is worked out in CSS against the large viewport (100lvh), which does not
+    // change when a phone's browser bars slide in and out. All it needs is each sheet's height,
+    // measured here only when a sheet itself changes size.
+    const heights = new WeakMap<HTMLElement, number>();
+    const measure = () => {
+      for (const sheet of sheets()) {
+        const h = sheet.offsetHeight;
+        if (heights.get(sheet) === h) continue;
+        heights.set(sheet, h);
+        sheet.style.setProperty("--sheet-h", `${h}px`);
+      }
+    };
+
+    // Each sheet dims under a layer of its own whose opacity is the only thing that changes,
+    // so scrolling never restyles a section's content.
+    const covers = new WeakMap<HTMLElement, HTMLElement>();
+    const opacities = new WeakMap<HTMLElement, string>();
+    const ensureCovers = () => {
+      for (const sheet of sheets()) {
+        if (covers.get(sheet)?.parentElement === sheet) continue;
+        const cover = document.createElement("div");
+        cover.className = "sheet-cover";
+        cover.setAttribute("aria-hidden", "true");
+        sheet.appendChild(cover);
+        covers.set(sheet, cover);
+        opacities.delete(sheet);
+      }
     };
 
     let frame = 0;
@@ -39,18 +54,19 @@ export default function SectionStack({ children }: { children: ReactNode }) {
       frame = 0;
       const viewport = window.innerHeight;
       const all = sheets();
+      // Read every position first, then write, so the browser lays out once.
+      const tops = all.map((sheet) => sheet.getBoundingClientRect().top);
       for (let i = 0; i < all.length - 1; i++) {
-        const nextTop = all[i + 1].getBoundingClientRect().top;
-        const cover = Math.min(1, Math.max(0, 1 - nextTop / viewport));
-        all[i].style.setProperty("--cover", cover.toFixed(3));
+        const cover = Math.min(1, Math.max(0, 1 - tops[i + 1] / viewport));
+        const opacity = (cover * 0.5).toFixed(3);
+        if (opacities.get(all[i]) === opacity) continue;
+        opacities.set(all[i], opacity);
+        const layer = covers.get(all[i]);
+        if (layer) layer.style.opacity = opacity;
       }
     };
     const schedule = () => {
       if (!frame) frame = requestAnimationFrame(paint);
-    };
-    const relayout = () => {
-      layout();
-      schedule();
     };
 
     // A pinned section reports where it is stuck, not where it sits in the page, so in-page
@@ -75,21 +91,22 @@ export default function SectionStack({ children }: { children: ReactNode }) {
       history.pushState(null, "", link.getAttribute("href"));
     };
 
-    layout();
-    paint();
-    root.dataset.stack = "on";
-
-    const resize = new ResizeObserver(relayout);
+    const resize = new ResizeObserver(() => {
+      measure();
+      schedule();
+    });
     const watch = () => {
+      ensureCovers();
       resize.disconnect();
       for (const sheet of sheets()) resize.observe(sheet);
-      relayout();
+      measure();
+      schedule();
     };
     watch();
+    root.dataset.stack = "on";
     // Re-measure and re-observe whenever a section is swapped for a new element.
     const mutations = new MutationObserver(watch);
     mutations.observe(root, { childList: true });
-    window.addEventListener("resize", relayout);
     window.addEventListener("scroll", schedule, { passive: true });
     document.addEventListener("click", onClick);
 
@@ -97,10 +114,10 @@ export default function SectionStack({ children }: { children: ReactNode }) {
       cancelAnimationFrame(frame);
       resize.disconnect();
       mutations.disconnect();
-      window.removeEventListener("resize", relayout);
       window.removeEventListener("scroll", schedule);
       document.removeEventListener("click", onClick);
       delete root.dataset.stack;
+      for (const sheet of sheets()) covers.get(sheet)?.remove();
     };
   }, []);
 

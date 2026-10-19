@@ -445,9 +445,17 @@
 /*
  * Page sections as stacked sheets. Each sheet after the first rises 2rem over the one
  * before it with rounded top corners, so section changes read as layers rather than
- * hard cuts. SectionStack adds the sticky offsets and the dimming (--cover, 0 to 1).
+ * hard cuts. SectionStack measures each sheet's height (--sheet-h) and drives the dimming.
  * Unlayered on purpose, so it wins over the position utilities on the sections.
  */
+
+/* Only the sheet itself reads its height, so updating it never restyles the sheet's content. */
+@property --sheet-h {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
 .section-stack {
   --sheet-overlap: 2rem;
   /* How far a page stays put, fully in view, before the next one starts to slide over it. */
@@ -480,20 +488,31 @@
   margin-bottom: var(--sheet-dwell);
 }
 
+/*
+ * A sheet pins once its bottom (plus the strip the next sheet overlaps) reaches the bottom of
+ * the screen; sheets no taller than the screen pin at the top. Measured against the large
+ * viewport (lvh), which stays put while a phone's browser bars slide in and out, so the pin
+ * never lags behind them and nothing underneath shows through.
+ */
 .section-stack[data-stack="on"] > * {
   position: sticky;
-  top: var(--sheet-top, 0px);
+  top: min(0px, calc(100lvh + var(--sheet-overlap) - var(--sheet-h)));
 }
 
-.section-stack > *::after {
-  content: "";
+.section-stack[data-stack="on"] > *:last-child {
+  top: min(0px, calc(100lvh - var(--sheet-h)));
+}
+
+/* The dimming layer SectionStack adds to each sheet: only its opacity changes, on the GPU. */
+.sheet-cover {
   position: absolute;
   inset: 0;
   z-index: 40;
   border-radius: inherit;
   background: #000;
-  opacity: calc(var(--cover, 0) * 0.5);
+  opacity: 0;
   pointer-events: none;
+  will-change: opacity;
 }
 
 @media (max-width: 639px) {
