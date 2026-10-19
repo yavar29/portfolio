@@ -30,7 +30,7 @@ export default function HeroSection() {
     <section
       id="top"
       data-nav-theme="dark"
-      className="hero on-dark relative flex min-h-svh flex-col overflow-hidden bg-night text-on-night"
+      className="hero on-dark relative flex min-h-svh flex-col overflow-hidden bg-night bg-[radial-gradient(circle,rgb(255_255_255/0.06)_1px,transparent_1.25px)] bg-[length:24px_24px] text-on-night"
     >
       <div className="container-page relative pt-24 sm:pt-28">
         <h1 className="hero-name rise -ml-[0.04em] text-white">Yavar Khan</h1>
