@@ -57,5 +57,6 @@ DEPLOYMENT.md
 # Unused document variants — not referenced by src/, so they stay out.
 # Anything src/lib/data.ts links to MUST be tracked, or a fresh clone 404s on it.
 public/YavarKhan_ML_Resume.pdf
+public/YavarKhan_Resume_ML.pdf
 public/YavarKhan_ResumeAI_ML.pdf
 public/YavarKhan_TranscriptMS_Unoff.pdf
