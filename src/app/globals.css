@@ -155,6 +155,19 @@
     }
   }
 
+  /*
+   * From xl the portrait stands from just under the name's top to the bottom edge, at most
+   * --portrait-w wide. --cover-h is how tall the cover can get before the portrait is at full
+   * size; past that the cover stops growing, so its head stays in front of the name.
+   */
+  @media (min-width: 1280px) {
+    .hero {
+      --portrait-w: 40rem;
+      --portrait-top: calc(7rem + var(--name-size) * 0.11);
+      --cover-h: calc(var(--portrait-top) + var(--portrait-w) * 1152 / 896);
+    }
+  }
+
   .hero-name {
     font-size: var(--name-size);
     line-height: 0.82;

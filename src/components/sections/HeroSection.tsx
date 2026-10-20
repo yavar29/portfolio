@@ -32,94 +32,101 @@ export default function HeroSection() {
       data-nav-theme="dark"
       className="hero on-dark relative flex min-h-svh flex-col overflow-hidden bg-night bg-[radial-gradient(circle,rgb(255_255_255/0.06)_1px,transparent_1.25px)] bg-[length:24px_24px] text-on-night"
     >
-      <div className="container-page relative pt-24 sm:pt-28">
-        <h1 className="hero-name rise -ml-[0.04em] text-white">Yavar Khan</h1>
-      </div>
-
-      <div className="container-page relative z-10 mt-8 grid flex-1 gap-10 sm:mt-10 md:grid-cols-[minmax(0,1fr)_auto] md:items-center md:gap-x-10 xl:pb-10">
-        <div className="xl:max-w-[21.5rem]">
-          <p
-            className="rise text-[1.625rem] font-semibold leading-tight tracking-tight text-white sm:text-[1.875rem]"
-            style={delay(140)}
-          >
-            AI Engineer
-          </p>
-          <div className="rise mt-3" style={delay(200)}>
-            <p className="t-lead max-w-[38ch] text-mist xl:text-lg">
-              AI Engineer at Aerveil, building LLM agents, evals and decision systems on Claude.
-            </p>
-            <p className="mt-2 text-[0.9375rem] text-on-night-2">{SITE.location}</p>
-          </div>
-
-          <div className="rise mt-7 flex flex-wrap gap-2 sm:gap-3 xl:gap-2" style={delay(260)}>
-            <a href={RESUME.href} download={RESUME.filename} className={primaryButton}>
-              <Download aria-hidden className="size-4" />
-              Resume
-            </a>
-            <a href={SOCIAL_LINKS.github} target="_blank" rel="noopener noreferrer" className={secondaryButton}>
-              <GitHubMark className="size-4" />
-              GitHub
-            </a>
-            <a href={SOCIAL_LINKS.linkedin} target="_blank" rel="noopener noreferrer" className={secondaryButton}>
-              <LinkedInMark className="size-4" />
-              LinkedIn
-            </a>
-          </div>
-        </div>
-
-        {/* The rise animation lives on the wrapper so it can't hold the link's hover transform. */}
-        <div className="rise justify-self-center md:justify-self-end" style={delay(320)}>
-          <a
-            href={professionalCert.verifyUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={`${professionalCert.title}, issued by ${professionalCert.issuer}. Verify on Credly`}
-            className="badge-link relative block rounded-3xl"
-          >
-            <img
-              src={BADGE}
-              srcSet={BADGE_SET}
-              sizes={BADGE_SIZES}
-              alt=""
-              width={256}
-              height={256}
-              className="block size-[10.5rem] xl:size-[clamp(11rem,17vw,16rem)]"
-            />
-            <span aria-hidden className="badge-sheen" style={{ "--badge": `url(${BADGE_MASK})` } as CSSProperties} />
-          </a>
-        </div>
-      </div>
-
       {/*
-        Phones have no hero portrait (About opens with one). From md it follows the content;
-        from xl it is taken out of flow, centered on the bottom edge and as tall as the screen
-        allows, so its head sits in front of the name.
+        Name, details and portrait hold together as one cover. On a screen taller than the cover
+        (a tall window, or the page zoomed out) it sits on the bottom edge and the extra space
+        goes above it, so the portrait's head always rises in front of the name.
       */}
-      <div className="mt-10 hidden justify-center px-5 md:flex xl:absolute xl:inset-x-0 xl:bottom-0 xl:top-[calc(7rem+var(--name-size)*0.11)] xl:mt-0 xl:px-0">
-        <div className="rise xl:h-full" style={delay(80)}>
-          <picture className="block xl:h-full">
-            {/* A 1px stand-in so phones never download the hidden portrait. */}
-            <source media="(max-width: 767px)" srcSet="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
-            <source
-              type="image/avif"
-              srcSet="/images/yavar-hero-480.avif 480w, /images/yavar-hero-720.avif 720w, /images/yavar-hero-896.avif 896w"
-              sizes={PORTRAIT_SIZES}
-            />
-            <source
-              type="image/webp"
-              srcSet="/images/yavar-hero-480.webp 480w, /images/yavar-hero-720.webp 720w, /images/yavar-hero-896.webp 896w"
-              sizes={PORTRAIT_SIZES}
-            />
-            <img
-              src="/images/yavar-hero-720.webp"
-              alt="Portrait of Yavar Khan"
-              width={896}
-              height={1152}
-              fetchPriority="high"
-              decoding="async"
-              className="block h-auto w-full max-w-[20rem] md:max-w-[24rem] contrast-[1.06] grayscale xl:h-full xl:w-auto xl:max-w-[40rem] xl:object-contain xl:object-bottom"
-            />
-          </picture>
+      <div className="relative flex flex-1 flex-col xl:mt-auto xl:max-h-[var(--cover-h)]">
+        <div className="container-page relative pt-24 sm:pt-28">
+          <h1 className="hero-name rise -ml-[0.04em] text-white">Yavar Khan</h1>
+        </div>
+
+        <div className="container-page relative z-10 mt-8 grid flex-1 gap-10 sm:mt-10 md:grid-cols-[minmax(0,1fr)_auto] md:items-center md:gap-x-10 xl:pb-10">
+          <div className="xl:max-w-[21.5rem]">
+            <p
+              className="rise text-[1.625rem] font-semibold leading-tight tracking-tight text-white sm:text-[1.875rem]"
+              style={delay(140)}
+            >
+              AI Engineer
+            </p>
+            <div className="rise mt-3" style={delay(200)}>
+              <p className="t-lead max-w-[38ch] text-mist xl:text-lg">
+                AI Engineer at Aerveil, building LLM agents, evals and decision systems on Claude.
+              </p>
+              <p className="mt-2 text-[0.9375rem] text-on-night-2">{SITE.location}</p>
+            </div>
+
+            <div className="rise mt-7 flex flex-wrap gap-2 sm:gap-3 xl:gap-2" style={delay(260)}>
+              <a href={RESUME.href} download={RESUME.filename} className={primaryButton}>
+                <Download aria-hidden className="size-4" />
+                Resume
+              </a>
+              <a href={SOCIAL_LINKS.github} target="_blank" rel="noopener noreferrer" className={secondaryButton}>
+                <GitHubMark className="size-4" />
+                GitHub
+              </a>
+              <a href={SOCIAL_LINKS.linkedin} target="_blank" rel="noopener noreferrer" className={secondaryButton}>
+                <LinkedInMark className="size-4" />
+                LinkedIn
+              </a>
+            </div>
+          </div>
+
+          {/* The rise animation lives on the wrapper so it can't hold the link's hover transform. */}
+          <div className="rise justify-self-center md:justify-self-end" style={delay(320)}>
+            <a
+              href={professionalCert.verifyUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`${professionalCert.title}, issued by ${professionalCert.issuer}. Verify on Credly`}
+              className="badge-link relative block rounded-3xl"
+            >
+              <img
+                src={BADGE}
+                srcSet={BADGE_SET}
+                sizes={BADGE_SIZES}
+                alt=""
+                width={256}
+                height={256}
+                className="block size-[10.5rem] xl:size-[clamp(11rem,17vw,16rem)]"
+              />
+              <span aria-hidden className="badge-sheen" style={{ "--badge": `url(${BADGE_MASK})` } as CSSProperties} />
+            </a>
+          </div>
+        </div>
+
+        {/*
+          Phones have no hero portrait (About opens with one). From md it follows the content;
+          from xl it is taken out of flow, centered on the bottom edge and as tall as the cover
+          allows, so its head sits in front of the name.
+        */}
+        <div className="mt-10 hidden justify-center px-5 md:flex xl:absolute xl:inset-x-0 xl:bottom-0 xl:top-[var(--portrait-top)] xl:mt-0 xl:px-0">
+          <div className="rise xl:h-full" style={delay(80)}>
+            <picture className="block xl:h-full">
+              {/* A 1px stand-in so phones never download the hidden portrait. */}
+              <source media="(max-width: 767px)" srcSet="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
+              <source
+                type="image/avif"
+                srcSet="/images/yavar-hero-480.avif 480w, /images/yavar-hero-720.avif 720w, /images/yavar-hero-896.avif 896w"
+                sizes={PORTRAIT_SIZES}
+              />
+              <source
+                type="image/webp"
+                srcSet="/images/yavar-hero-480.webp 480w, /images/yavar-hero-720.webp 720w, /images/yavar-hero-896.webp 896w"
+                sizes={PORTRAIT_SIZES}
+              />
+              <img
+                src="/images/yavar-hero-720.webp"
+                alt="Portrait of Yavar Khan"
+                width={896}
+                height={1152}
+                fetchPriority="high"
+                decoding="async"
+                className="block h-auto w-full max-w-[20rem] md:max-w-[24rem] contrast-[1.06] grayscale xl:h-full xl:w-auto xl:max-w-[var(--portrait-w)] xl:object-contain xl:object-bottom"
+              />
+            </picture>
+          </div>
         </div>
       </div>
     </section>
